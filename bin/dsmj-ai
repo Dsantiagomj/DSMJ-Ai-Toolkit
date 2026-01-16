@@ -1,0 +1,625 @@
+#!/usr/bin/env bash
+
+# dsmj-ai-toolkit CLI
+# Installation and management tool for Claude AI toolkit
+
+set -euo pipefail
+
+VERSION="1.0.0"
+TOOLKIT_DIR="$HOME/.dsmj-ai-toolkit"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Helper functions
+info() {
+    echo -e "${BLUE}ℹ${NC}  $1"
+}
+
+success() {
+    echo -e "${GREEN}✓${NC}  $1"
+}
+
+warn() {
+    echo -e "${YELLOW}⚠${NC}  $1"
+}
+
+error() {
+    echo -e "${RED}✗${NC}  $1" >&2
+}
+
+# Check if running from source or installed
+if [[ "$SCRIPT_DIR" == "$TOOLKIT_DIR"* ]]; then
+    # Running from installed location
+    SOURCE_DIR="$TOOLKIT_DIR"
+else
+    # Running from development/source
+    SOURCE_DIR="$(dirname "$SCRIPT_DIR")"
+fi
+
+##############################################################################
+# Command: install
+##############################################################################
+cmd_install() {
+    info "Installing dsmj-ai-toolkit v${VERSION}..."
+
+    if [[ -d "$TOOLKIT_DIR" ]]; then
+        warn "Toolkit already installed at $TOOLKIT_DIR"
+        read -p "Reinstall? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            info "Installation cancelled"
+            return 0
+        fi
+        rm -rf "$TOOLKIT_DIR"
+    fi
+
+    # Create toolkit directory
+    mkdir -p "$TOOLKIT_DIR"
+
+    # Copy files to global location
+    info "Copying files to $TOOLKIT_DIR..."
+    cp -r "$SOURCE_DIR/templates" "$TOOLKIT_DIR/"
+    cp -r "$SOURCE_DIR/agents" "$TOOLKIT_DIR/"
+    cp -r "$SOURCE_DIR/skills" "$TOOLKIT_DIR/"
+    cp -r "$SOURCE_DIR/bin" "$TOOLKIT_DIR/"
+
+    # Make CLI executable
+    chmod +x "$TOOLKIT_DIR/bin/dsmj-ai"
+
+    # Add to PATH if not already there
+    SHELL_CONFIG=""
+    if [[ -f "$HOME/.zshrc" ]]; then
+        SHELL_CONFIG="$HOME/.zshrc"
+    elif [[ -f "$HOME/.bashrc" ]]; then
+        SHELL_CONFIG="$HOME/.bashrc"
+    fi
+
+    if [[ -n "$SHELL_CONFIG" ]]; then
+        if ! grep -q "dsmj-ai-toolkit" "$SHELL_CONFIG"; then
+            echo "" >> "$SHELL_CONFIG"
+            echo "# dsmj-ai-toolkit" >> "$SHELL_CONFIG"
+            echo "export PATH=\"\$HOME/.dsmj-ai-toolkit/bin:\$PATH\"" >> "$SHELL_CONFIG"
+            success "Added to PATH in $SHELL_CONFIG"
+            warn "Run 'source $SHELL_CONFIG' or restart terminal to use 'dsmj-ai' command"
+        else
+            info "Already in PATH"
+        fi
+    fi
+
+    success "Toolkit installed successfully!"
+    info "Run 'dsmj-ai init' in your project directory to set up"
+}
+
+##############################################################################
+# Command: init (interactive project setup)
+##############################################################################
+cmd_init() {
+    info "Initializing dsmj-ai-toolkit for this project..."
+
+    # Check for existing .claude directory
+    local has_existing_claude=false
+    local has_existing_mcp=false
+
+    if [[ -d ".claude" ]]; then
+        has_existing_claude=true
+
+        # Check for existing MCP or other configurations
+        if [[ -f ".claude/settings.json" ]] || [[ -f ".claude/mcp.json" ]] || [[ -f ".claude/config.json" ]]; then
+            has_existing_mcp=true
+        fi
+    fi
+
+    # If existing configs found, be careful
+    if [[ "$has_existing_claude" = true ]]; then
+        echo ""
+        warn ".claude/ directory already exists"
+
+        if [[ "$has_existing_mcp" = true ]]; then
+            info "Detected existing configuration files (MCP servers, settings, etc.)"
+            info "Toolkit will ONLY add:"
+            echo "  - .claude/agents/ (symlinks to toolkit agents)"
+            echo "  - .claude/skills/ (symlinks to toolkit skills)"
+            echo "  - .claude/CLAUDE.md (if it doesn't exist)"
+            echo ""
+            info "Toolkit will NOT touch:"
+            echo "  - .claude/settings.json"
+            echo "  - .claude/mcp.json"
+            echo "  - .claude/config.json"
+            echo "  - Any other existing files"
+            echo ""
+        fi
+
+        read -p "Continue with additive installation? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            info "Initialization cancelled"
+            return 0
+        fi
+    fi
+
+    # Create .claude subdirectories (won't overwrite existing .claude/)
+    mkdir -p .claude/agents
+    mkdir -p .claude/skills
+
+    # Detect stack
+    info "Detecting project stack..."
+    detected_stack=$(detect_stack)
+
+    echo ""
+    echo "Detected stack: $detected_stack"
+    echo ""
+
+    # Interactive skill selection
+    echo "Select skills to include:"
+    declare -a selected_skills=()
+
+    # Stack skills
+    if echo "$detected_stack" | grep -q "React"; then
+        selected_skills+=("react-19")
+    fi
+    if echo "$detected_stack" | grep -q "Next.js"; then
+        selected_skills+=("nextjs-15")
+    fi
+    if echo "$detected_stack" | grep -q "Python"; then
+        selected_skills+=("python-312")
+    fi
+    if echo "$detected_stack" | grep -q "TypeScript"; then
+        selected_skills+=("typescript")
+    fi
+
+    # Always include security and context-monitor
+    selected_skills+=("security")
+    selected_skills+=("context-monitor")
+
+    # Show selected skills
+    info "Skills to be linked:"
+    for skill in "${selected_skills[@]}"; do
+        echo "  - $skill"
+    done
+    echo ""
+
+    # Ask about Ralph Wiggum (optional iterative agent)
+    echo ""
+    echo "Ralph Wiggum - Iterative Specialist (Optional)"
+    echo "Keeps working until task completion. Best for:"
+    echo "  - Overnight builds / TDD"
+    echo "  - Well-defined tasks with clear completion criteria"
+    echo "  - Iterative refinement until tests pass"
+    echo ""
+    read -p "Include Ralph Wiggum agent? (y/N): " -n 1 -r
+    echo ""
+    local include_ralph=false
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        include_ralph=true
+    fi
+
+    # Create symlinks for agents
+    info "Linking agents..."
+    ln -sf "$TOOLKIT_DIR/agents/code-writer.md" ".claude/agents/code-writer.md"
+    success "Linked code-writer.md"
+
+    ln -sf "$TOOLKIT_DIR/agents/code-reviewer.md" ".claude/agents/code-reviewer.md"
+    success "Linked code-reviewer.md"
+
+    if [[ "$include_ralph" = true ]]; then
+        ln -sf "$TOOLKIT_DIR/agents/ralph-wiggum.md" ".claude/agents/ralph-wiggum.md"
+        success "Linked ralph-wiggum.md"
+    fi
+
+    # Create symlinks for skills
+    info "Linking skills..."
+    for skill in "${selected_skills[@]}"; do
+        # Determine skill path
+        skill_path=""
+        if [[ -d "$TOOLKIT_DIR/skills/stack/$skill" ]]; then
+            skill_path="$TOOLKIT_DIR/skills/stack/$skill"
+        elif [[ -d "$TOOLKIT_DIR/skills/domain/$skill" ]]; then
+            skill_path="$TOOLKIT_DIR/skills/domain/$skill"
+        elif [[ -d "$TOOLKIT_DIR/skills/meta/$skill" ]]; then
+            skill_path="$TOOLKIT_DIR/skills/meta/$skill"
+        fi
+
+        if [[ -n "$skill_path" ]]; then
+            ln -sf "$skill_path" ".claude/skills/$skill"
+            success "Linked $skill"
+        else
+            warn "Skill $skill not found"
+        fi
+    done
+
+    # Generate CLAUDE.md from template (only if it doesn't exist)
+    if [[ -f ".claude/CLAUDE.md" ]]; then
+        warn "CLAUDE.md already exists, skipping generation"
+        info "Your existing CLAUDE.md has been preserved"
+        info "To regenerate, delete .claude/CLAUDE.md and run 'dsmj-ai init' again"
+    else
+        info "Generating CLAUDE.md..."
+        generate_claude_md "$detected_stack"
+        success "Created .claude/CLAUDE.md"
+    fi
+
+    # Success message
+    echo ""
+    success "Project initialized successfully!"
+    echo ""
+    info "Next steps:"
+    if [[ ! -f ".claude/CLAUDE.md" ]] || [[ "$has_existing_mcp" = false ]]; then
+        echo "  1. Review and customize .claude/CLAUDE.md"
+        echo "  2. Start Claude Code in this directory"
+        echo "  3. Try: 'Use maestro mode' for casual communication style"
+    else
+        echo "  1. Your existing MCP configurations are preserved"
+        echo "  2. Toolkit agents and skills are now available"
+        echo "  3. Start Claude Code in this directory"
+        echo "  4. Try: 'Use maestro mode' for casual communication style"
+    fi
+    echo ""
+}
+
+##############################################################################
+# Helper: Detect Stack
+##############################################################################
+detect_stack() {
+    local stack=""
+
+    # Check for package.json (Node.js projects)
+    if [[ -f "package.json" ]]; then
+        if grep -q '"next"' package.json; then
+            stack+="Next.js, "
+        fi
+        if grep -q '"react"' package.json; then
+            stack+="React, "
+        fi
+        if grep -q '"typescript"' package.json || [[ -f "tsconfig.json" ]]; then
+            stack+="TypeScript, "
+        fi
+        if grep -q '"express"' package.json; then
+            stack+="Express, "
+        fi
+    fi
+
+    # Check for Python
+    if [[ -f "requirements.txt" ]] || [[ -f "pyproject.toml" ]] || [[ -f "Pipfile" ]]; then
+        stack+="Python, "
+
+        if grep -q "django" requirements.txt 2>/dev/null || grep -q "django" pyproject.toml 2>/dev/null; then
+            stack+="Django, "
+        fi
+        if grep -q "fastapi" requirements.txt 2>/dev/null || grep -q "fastapi" pyproject.toml 2>/dev/null; then
+            stack+="FastAPI, "
+        fi
+    fi
+
+    # Check for Go
+    if [[ -f "go.mod" ]]; then
+        stack+="Go, "
+    fi
+
+    # Check for Rust
+    if [[ -f "Cargo.toml" ]]; then
+        stack+="Rust, "
+    fi
+
+    # Remove trailing comma and space
+    stack="${stack%, }"
+
+    if [[ -z "$stack" ]]; then
+        stack="Unknown (no package.json, requirements.txt, or other markers found)"
+    fi
+
+    echo "$stack"
+}
+
+##############################################################################
+# Helper: Generate CLAUDE.md
+##############################################################################
+generate_claude_md() {
+    local stack="$1"
+    local template="$TOOLKIT_DIR/templates/CLAUDE.md.template"
+    local output=".claude/CLAUDE.md"
+
+    # Copy template
+    cp "$template" "$output"
+
+    # Replace placeholders
+    local date=$(date +%Y-%m-%d)
+
+    # Use sed for replacements (macOS and Linux compatible)
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' "s/\[e.g., Next.js 15, React 19, TypeScript, Prisma\]/$stack/" "$output"
+        sed -i '' "s/\[Will be updated by installation wizard\]/$date/" "$output"
+        sed -i '' "s/\[VERSION\]/$VERSION/" "$output"
+        sed -i '' "s/\[DATE\]/$date/" "$output"
+    else
+        # Linux
+        sed -i "s/\[e.g., Next.js 15, React 19, TypeScript, Prisma\]/$stack/" "$output"
+        sed -i "s/\[Will be updated by installation wizard\]/$date/" "$output"
+        sed -i "s/\[VERSION\]/$VERSION/" "$output"
+        sed -i "s/\[DATE\]/$date/" "$output"
+    fi
+}
+
+##############################################################################
+# Command: sync (resync skills based on current stack)
+##############################################################################
+cmd_sync() {
+    if [[ ! -d ".claude" ]]; then
+        error "Not a dsmj-ai project. Run 'dsmj-ai init' first"
+        exit 1
+    fi
+
+    info "Resyncing skills based on current stack..."
+
+    detected_stack=$(detect_stack)
+    info "Detected: $detected_stack"
+
+    # Remove old skill symlinks
+    find .claude/skills -type l -delete
+
+    # Re-create based on detection (simplified - just use init logic)
+    warn "Full sync not implemented yet. Run 'dsmj-ai init' to reinitialize"
+}
+
+##############################################################################
+# Command: update (update global toolkit)
+##############################################################################
+cmd_update() {
+    info "Updating dsmj-ai-toolkit..."
+
+    if [[ ! -d "$TOOLKIT_DIR" ]]; then
+        error "Toolkit not installed. Run 'dsmj-ai install' first"
+        exit 1
+    fi
+
+    # For now, just reinstall
+    # In production, this would pull from git/homebrew
+    warn "Update command not fully implemented"
+    info "To update, run: dsmj-ai install"
+}
+
+##############################################################################
+# Command: ralph (run Ralph Wiggum iterative loop)
+##############################################################################
+cmd_ralph() {
+    if [[ ! -d ".claude" ]]; then
+        error "Not a dsmj-ai project. Run 'dsmj-ai init' first"
+        exit 1
+    fi
+
+    if [[ ! -f ".claude/agents/ralph-wiggum.md" ]]; then
+        error "Ralph Wiggum agent not installed"
+        info "Run 'dsmj-ai init' and select 'y' when asked about Ralph Wiggum"
+        info "Or manually link: ln -s ~/.dsmj-ai-toolkit/agents/ralph-wiggum.md .claude/agents/"
+        exit 1
+    fi
+
+    local prompt="${1:-}"
+    local max_iterations="${2:-30}"
+    local completion_phrase="${3:-TASK_COMPLETE}"
+
+    if [[ -z "$prompt" ]]; then
+        error "Prompt required"
+        echo ""
+        echo "Usage: dsmj-ai ralph <prompt> [max-iterations] [completion-phrase]"
+        echo ""
+        echo "Examples:"
+        echo "  dsmj-ai ralph \"Fix all TypeScript errors\" 20 BUILD_SUCCESS"
+        echo "  dsmj-ai ralph \"Implement auth with passing tests\" 30 TESTS_PASSING"
+        echo ""
+        exit 1
+    fi
+
+    info "Starting Ralph Wiggum iterative loop..."
+    echo ""
+    echo "Task: $prompt"
+    echo "Max iterations: $max_iterations"
+    echo "Completion phrase: $completion_phrase"
+    echo ""
+    warn "Ralph will keep iterating until completion or max iterations reached"
+    warn "Press Ctrl+C to stop manually"
+    echo ""
+    read -p "Continue? (y/N): " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        info "Cancelled"
+        exit 0
+    fi
+
+    # Create temporary prompt file
+    local prompt_file=".ralph-prompt.md"
+    cat > "$prompt_file" << EOF
+# Ralph Wiggum Iterative Task
+
+**Your role**: You are Ralph Wiggum, the iterative specialist. Keep working until completion.
+
+## Task
+$prompt
+
+## Completion Criteria
+You must output exactly this phrase when done:
+\`\`\`
+$completion_phrase
+\`\`\`
+
+## Instructions
+1. Attempt to complete the task
+2. Verify completion (run tests, build, check files, etc.)
+3. If NOT complete:
+   - Analyze what failed
+   - Learn from the failure
+   - Try a different approach
+   - DO NOT output completion phrase yet
+4. If complete and verified:
+   - Output completion summary
+   - Output the exact completion phrase: $completion_phrase
+5. Keep iterating until completion or you're truly stuck
+
+## Iteration Limit
+Maximum iterations: $max_iterations
+
+If you reach the limit without completion, output:
+\`\`\`
+INCOMPLETE - [brief reason]
+\`\`\`
+
+## Remember
+- Verify after each change (don't assume)
+- Learn from failures (don't repeat failed approaches)
+- Make incremental progress
+- Output $completion_phrase ONLY when truly complete
+EOF
+
+    success "Created prompt file: $prompt_file"
+    echo ""
+
+    # Note: The actual iterative loop would be implemented by Claude Code's task system
+    # For now, we just show the prompt and instructions
+    info "To run Ralph Wiggum loop manually:"
+    echo ""
+    echo "1. Start Claude Code in this directory"
+    echo "2. Use the Task tool to spawn ralph-wiggum agent with this prompt:"
+    echo "   cat $prompt_file"
+    echo ""
+    echo "3. Ralph will iterate until completion"
+    echo ""
+    warn "Automated loop (while :; do cat PROMPT.md | claude ; done) requires"
+    warn "Claude Code CLI integration - coming in future update"
+    echo ""
+    info "For now, use manual iteration:"
+    echo "  - Spawn ralph-wiggum via Task tool"
+    echo "  - It will work until complete or stuck"
+    echo "  - Re-spawn if needed with same prompt"
+}
+
+##############################################################################
+# Command: status (show installation status)
+##############################################################################
+cmd_status() {
+    echo "dsmj-ai-toolkit v${VERSION}"
+    echo ""
+
+    if [[ -d "$TOOLKIT_DIR" ]]; then
+        success "Toolkit installed at $TOOLKIT_DIR"
+
+        # Count agents and skills
+        local agent_count=$(find "$TOOLKIT_DIR/agents" -name "*.md" 2>/dev/null | wc -l)
+        local skill_count=$(find "$TOOLKIT_DIR/skills" -type f -name "SKILL.md" 2>/dev/null | wc -l)
+
+        info "Agents available: $agent_count"
+        info "Skills available: $skill_count"
+    else
+        warn "Toolkit not installed globally"
+        info "Run 'dsmj-ai install' to install"
+    fi
+
+    echo ""
+
+    if [[ -d ".claude" ]]; then
+        success "Project initialized in current directory"
+
+        local linked_agents=$(find .claude/agents -type l 2>/dev/null | wc -l)
+        local linked_skills=$(find .claude/skills -type l 2>/dev/null | wc -l)
+
+        info "Linked agents: $linked_agents"
+        info "Linked skills: $linked_skills"
+    else
+        warn "Current directory not initialized"
+        info "Run 'dsmj-ai init' to initialize"
+    fi
+}
+
+##############################################################################
+# Command: version
+##############################################################################
+cmd_version() {
+    echo "dsmj-ai-toolkit v${VERSION}"
+}
+
+##############################################################################
+# Command: help
+##############################################################################
+cmd_help() {
+    cat << EOF
+dsmj-ai-toolkit v${VERSION}
+
+USAGE:
+    dsmj-ai <command> [options]
+
+COMMANDS:
+    install     Install toolkit globally (~/.dsmj-ai-toolkit/)
+    init        Initialize current project with interactive wizard
+    ralph       Run Ralph Wiggum iterative loop for task completion
+    sync        Resync skills based on current stack (WIP)
+    update      Update global toolkit (WIP)
+    status      Show installation and project status
+    version     Show version
+    help        Show this help message
+
+EXAMPLES:
+    # First-time installation
+    dsmj-ai install
+
+    # Initialize a project
+    cd my-project
+    dsmj-ai init
+
+    # Run iterative task completion (if Ralph Wiggum enabled)
+    dsmj-ai ralph "Fix all TypeScript errors" 20 BUILD_SUCCESS
+    dsmj-ai ralph "Implement auth with tests" 30 TESTS_PASSING
+
+    # Check status
+    dsmj-ai status
+
+For more information, visit: https://github.com/dsantiagomj/dsmj-ai-toolkit
+EOF
+}
+
+##############################################################################
+# Main
+##############################################################################
+main() {
+    local command="${1:-help}"
+
+    case "$command" in
+        install)
+            cmd_install
+            ;;
+        init)
+            cmd_init
+            ;;
+        ralph)
+            shift  # Remove 'ralph' from arguments
+            cmd_ralph "$@"
+            ;;
+        sync)
+            cmd_sync
+            ;;
+        update)
+            cmd_update
+            ;;
+        status)
+            cmd_status
+            ;;
+        version|--version|-v)
+            cmd_version
+            ;;
+        help|--help|-h)
+            cmd_help
+            ;;
+        *)
+            error "Unknown command: $command"
+            echo ""
+            cmd_help
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
