@@ -439,13 +439,13 @@ Reference skills when needed, explain WHEN and WHY:
 ```markdown
 **Reference skills**:
 - **security**: When handling auth, user input, or sensitive data
-- **react-19**: When creating components or using hooks
+- **react**: When creating components or using hooks
 - **api-design**: When designing REST endpoints
 ```
 
 **Bad**:
 ```markdown
-**Reference skills**: security, react-19, api-design
+**Reference skills**: security, react, api-design
 ```
 (No context on when/why)
 
@@ -580,7 +580,7 @@ Skills provide domain knowledge. Reference them:
 **In skill references section (frontmatter-style)**:
 ```yaml
 ---
-skills: [security, react-19, testing-frameworks, api-design]
+skills: [security, react, testing-frameworks, api-design]
 ---
 ```
 

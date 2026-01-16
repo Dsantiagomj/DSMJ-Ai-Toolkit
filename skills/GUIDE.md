@@ -60,17 +60,17 @@ Start Claude Code and verify skill loads correctly.
 - Maximum 64 characters
 - Lowercase letters, numbers, hyphens only
 - No XML tags, no reserved words
-- Use kebab-case: `react-19`, not `React 19`
+- Use kebab-case: `react`, not `React 19`
 - Gerund form recommended: `testing-patterns`, `api-designing`
 
 **Best practices**:
 - Descriptive: `typescript-patterns` not `ts`
-- Version-specific if relevant: `react-19`, `nextjs-15`
+- Version-specific if relevant: `react`, `nextjs`
 - Domain-clear: `security`, `accessibility`
 
 **Examples**:
 ```yaml
-✅ name: react-19
+✅ name: react
 ✅ name: testing-patterns
 ✅ name: api-design
 
@@ -153,7 +153,7 @@ metadata:
 **Stack Skill** (React):
 ```yaml
 ---
-name: react-19
+name: react
 version: 19.0.0
 description: React 19 patterns with Server Components, Actions, and modern hooks. Use when writing React components, JSX files, or working with React-specific features.
 tags: [react, frontend, javascript, typescript, ui, components]
@@ -321,9 +321,9 @@ skill-name/
 **Example flow**:
 ```
 User: "Implement React Server Components"
-→ Claude loads react-19/SKILL.md (main patterns)
+→ Claude loads react/SKILL.md (main patterns)
 → User: "How to handle streaming?"
-→ Claude loads react-19/references/server-components.md (detailed)
+→ Claude loads react/references/server-components.md (detailed)
 ```
 
 ---
@@ -335,7 +335,7 @@ User: "Implement React Server Components"
 Each skill covers ONE domain.
 
 **Good**:
-- `react-19`: React-specific patterns
+- `react`: React-specific patterns
 - `security`: Security best practices
 - `accessibility`: WCAG compliance
 
@@ -621,12 +621,12 @@ validateData(data);
 Technology-specific patterns for frameworks and languages.
 
 **Examples**:
-- `react-19/` - React 19 patterns
-- `nextjs-15/` - Next.js 15 App Router
-- `python-312/` - Python 3.12 best practices
+- `react/` - React 19 patterns
+- `nextjs/` - Next.js 15 App Router
+- `python/` - Python 3.12 best practices
 - `typescript/` - TypeScript patterns
 - `vue-3/` - Vue 3 Composition API
-- `django-5/` - Django 5 ORM and views
+- `django/` - Django 5 ORM and views
 
 **Characteristics**:
 - Version-specific (include version in name)
@@ -742,7 +742,7 @@ description: Everything about web dev
 
 **Good**:
 ```yaml
-name: react-19
+name: react
 description: React 19 patterns with Server Components and modern hooks
 ```
 
@@ -916,10 +916,10 @@ claude-code
 
 Create scenario that should trigger skill:
 ```
-# For react-19 skill
+# For react skill
 You: "Create a Server Component that fetches posts"
 
-# Should reference react-19 skill automatically
+# Should reference react skill automatically
 ```
 
 ### 4. Test Progressive Disclosure

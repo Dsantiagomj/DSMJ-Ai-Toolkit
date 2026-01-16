@@ -63,6 +63,30 @@
       "installed": true
     },
     {
+      "name": "dsmj/prisma",
+      "displayName": "Prisma ORM",
+      "category": "database",
+      "description": "Prisma ORM for TypeScript - Type-safe database access and migrations",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer", "planner"],
+      "tags": ["prisma", "orm", "database", "typescript", "postgresql", "mysql", "migrations"],
+      "installed": true
+    },
+    {
+      "name": "dsmj/docker",
+      "displayName": "Docker",
+      "category": "cloud",
+      "description": "Docker containerization for development and deployment",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer", "planner", "devops"],
+      "tags": ["docker", "containers", "devops", "deployment", "docker-compose"],
+      "installed": true
+    },
+    {
       "name": "anthropics/react",
       "displayName": "React",
       "category": "web-development",

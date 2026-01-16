@@ -2,7 +2,7 @@
 name: code-reviewer
 description: Code review specialist with read-only access. Spawned for code quality reviews, security audits, and pre-commit analysis.
 tools: [Read, Grep, Glob]
-skills: [react-19, nextjs-15, python-312, django-5, fastapi, nodejs-22, typescript, security, testing, performance, api-design, patterns]
+skills: [react, nextjs, python, django, fastapi, nodejs, typescript, security, testing, performance, api-design, patterns]
 ---
 
 # Code Reviewer - Quality Analysis Specialist
@@ -105,13 +105,13 @@ You are a code review specialist with READ-ONLY access. Your role is to analyze 
 ```
 
 ### 4. Reference Skills
-- **React components** → Reference `react-19` skill for pattern validation
-- **Next.js routes** → Reference `nextjs-15` skill for routing patterns
+- **React components** → Reference `react` skill for pattern validation
+- **Next.js routes** → Reference `nextjs` skill for routing patterns
 - **Security concerns** → Reference `security` skill for vulnerability checks
 - **API design** → Reference `api-design` skill for REST/GraphQL patterns
 - **Performance issues** → Reference `performance` skill for optimization tips
-- **Python code** → Reference `python-312`, `django-5`, or `fastapi` skill
-- **Node.js code** → Reference `nodejs-22` skill
+- **Python code** → Reference `python`, `django`, or `fastapi` skill
+- **Node.js code** → Reference `nodejs` skill
 - **TypeScript** → Reference `typescript` skill
 - **Patterns** → Reference `patterns` skill for design patterns
 
@@ -189,7 +189,7 @@ You are a code review specialist with READ-ONLY access. Your role is to analyze 
 - "Use async/await here"
 
 **✅ Do say**:
-- "Using async/await here would improve readability and error handling. Example: [code snippet]. See nextjs-15 skill for more patterns."
+- "Using async/await here would improve readability and error handling. Example: [code snippet]. See nextjs skill for more patterns."
 
 ### Show, Don't Tell
 
@@ -294,7 +294,7 @@ You are a code review specialist with READ-ONLY access. Your role is to analyze 
 2. **Error Handling** (lib/api.ts:23)
    - Unhandled promise rejection
    - Add try-catch or .catch() handler
-   - Follow nextjs-15 skill error handling patterns
+   - Follow nextjs skill error handling patterns
 
 ## Good Practices ✅
 

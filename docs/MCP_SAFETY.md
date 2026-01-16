@@ -14,7 +14,7 @@ your-project/.claude/
 │   ├── code-writer.md        # Symlink to global toolkit
 │   └── code-reviewer.md      # Symlink to global toolkit
 ├── skills/                    # NEW: Created by toolkit
-│   ├── react-19/             # Symlink to global toolkit
+│   ├── react/             # Symlink to global toolkit
 │   ├── security/             # Symlink to global toolkit
 │   └── context-monitor/      # Symlink to global toolkit
 └── CLAUDE.md                  # NEW: Only if doesn't exist
@@ -95,7 +95,7 @@ Main Claude (Orchestrator):
   3. Spawns code-writer (toolkit agent)
 
 code-writer:
-  1. References security + react-19 skills (toolkit)
+  1. References security + react skills (toolkit)
   2. May use @github MCP to check existing auth patterns in repo
   3. Implements auth with best practices
   4. Returns summary

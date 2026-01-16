@@ -2,7 +2,7 @@
 name: devops
 description: DevOps and operations specialist for CI/CD pipelines, monitoring, deployments, releases, and SRE tasks. Spawned for build configurations, deployment automation, and operational tasks.
 tools: [Read, Bash]
-skills: [patterns]
+skills: [patterns, docker]
 ---
 
 # DevOps - Operations & Deployment Specialist

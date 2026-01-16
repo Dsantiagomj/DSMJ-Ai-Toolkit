@@ -1,6 +1,6 @@
 # Skills Catalog - Community Skills Reference
 
-**147+ skills for Claude Code agents** (5 local + 142 community)
+**149+ skills for Claude Code agents** (7 local + 142 community)
 
 This catalog includes local stack-specific skills and organizes community skills from the [awesome-claude-skills](https://github.com/VoltAgent/awesome-claude-skills) ecosystem.
 
@@ -59,6 +59,17 @@ These skills are maintained locally and pre-installed in your toolkit. They focu
   - Accessible, unstyled primitives
   - Dialog, Dropdown, Select, Tabs, etc.
   - For: code-writer, qa
+
+**Database & Infrastructure**:
+- **prisma** - Prisma ORM (Context7: /websites/prisma_io)
+  - Type-safe database access and migrations
+  - PostgreSQL, MySQL, SQLite support
+  - For: code-writer, planner
+
+- **docker** - Containerization (Context7: /websites/docker)
+  - Dockerfile and docker-compose patterns
+  - Development and production workflows
+  - For: code-writer, planner, devops
 
 All local skills include Context7 references for up-to-date documentation.
 
@@ -216,7 +227,7 @@ All local skills include Context7 references for up-to-date documentation.
 
 **Frontend Frameworks**:
 - React: anthropics/react, getsentry/sentry-react ⭐
-- Next.js: (use built-in stack/nextjs-15 skill)
+- Next.js: (use built-in stack/nextjs skill)
 - Vue: (create local skill as needed)
 - Angular: (create local skill as needed)
 

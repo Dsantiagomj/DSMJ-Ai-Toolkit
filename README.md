@@ -108,9 +108,9 @@ Frame outcome → Scope change → Generate → Review diff → Verify
 ### Skills
 
 **Stack Skills** (auto-loaded based on detection):
-- `react-19`: React 19 patterns with Server Components
-- `nextjs-15`: Next.js 15 App Router patterns
-- `python-312`: Python 3.12 best practices
+- `react`: React 19 patterns with Server Components
+- `nextjs`: Next.js 15 App Router patterns
+- `python`: Python 3.12 best practices
 - `typescript`: TypeScript patterns and types
 
 **Domain Skills** (always loaded):
@@ -131,8 +131,8 @@ The `.claude/CLAUDE.md` file is your **primary customization point**:
 **Architecture**: API routes in /app/api/, components in /components/
 
 ## Goals & Auto-Invoke Rules
-- **React components** → Reference react-19 skill
-- **API routes** → Reference nextjs-15 skill
+- **React components** → Reference react skill
+- **API routes** → Reference nextjs skill
 - **Security concerns** → Reference security skill
 
 ## Non-Goals (Anti-Patterns)
@@ -182,9 +182,9 @@ English slangs: bet, lowkey, ngl, fr, valid
 │   └── devops.md              # Optional: Operations
 ├── skills/
 │   ├── stack/
-│   │   ├── react-19/
-│   │   ├── nextjs-15/
-│   │   └── python-312/
+│   │   ├── react/
+│   │   ├── nextjs/
+│   │   └── python/
 │   ├── domain/
 │   │   └── security/
 │   └── meta/
@@ -206,7 +206,7 @@ my-project/
 │   │   ├── qa.md -> ~/.dsmj-ai-toolkit/agents/qa.md
 │   │   └── devops.md -> ~/.dsmj-ai-toolkit/agents/devops.md
 │   └── skills/                   # Symlinks to global
-│       ├── react-19 -> ~/.dsmj-ai-toolkit/skills/stack/react-19
+│       ├── react -> ~/.dsmj-ai-toolkit/skills/stack/react
 │       ├── security -> ~/.dsmj-ai-toolkit/skills/domain/security
 │       └── context-monitor -> ~/.dsmj-ai-toolkit/skills/meta/context-monitor
 └── [your project files]
@@ -271,7 +271,7 @@ Main Claude:
   2. Spawns code-writer for implementation
 
 code-writer:
-  1. References react-19 + security skills
+  1. References react + security skills
   2. Implements profile editing components and API
   3. Returns summary with file references
 
@@ -334,7 +334,7 @@ Result: Bug fixed, tested, committed
 Skills use progressive disclosure to minimize context:
 
 ```
-skills/stack/react-19/
+skills/stack/react/
 ├── SKILL.md              # Main content (~500 lines)
 └── references/           # Detailed docs (loaded as needed)
     ├── server-components.md
@@ -444,7 +444,7 @@ cp skills/TEMPLATE.md skills/domain/my-skill/SKILL.md
 - 3 core agents: code-writer, code-reviewer, git-docs
 - 2 recommended agents: planner, qa
 - 1 optional agent: devops
-- react-19 + security + context-monitor skills
+- react + security + context-monitor skills
 - CLAUDE.md with Prompt DNA + Maestro mode
 - Installation CLI with symlinks
 - MCP-safe installation (preserves existing configs)

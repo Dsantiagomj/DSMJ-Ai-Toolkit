@@ -24,9 +24,9 @@
 │  │   └── i18n              (qa)                         │
 │  │                                                       │
 │  ├── Stack Skills (3 - already created)                 │
-│  │   ├── react-19                                       │
-│  │   ├── nextjs-15                                      │
-│  │   └── python-312                                     │
+│  │   ├── react                                       │
+│  │   ├── nextjs                                      │
+│  │   └── python                                     │
 │  │                                                       │
 │  └── Meta Skills (1)                                    │
 │      └── context-monitor                                │
@@ -435,9 +435,9 @@ dsmj-ai-toolkit/
 │   │   │   └── references/
 │   │   └── security/                 # EXISTING
 │   ├── stack/
-│   │   ├── react-19/                 # EXISTING
-│   │   ├── nextjs-15/                # EXISTING
-│   │   └── python-312/               # EXISTING
+│   │   ├── react/                 # EXISTING
+│   │   ├── nextjs/                # EXISTING
+│   │   └── python/               # EXISTING
 │   └── meta/
 │       └── context-monitor/          # EXISTING
 ├── .dsmj-ai/
@@ -474,7 +474,7 @@ claude-code
 - ✅ performance (code-reviewer)
 - ✅ database-migrations (planner, devops)
 - ✅ i18n (qa)
-- ✅ react-19, nextjs-15, python-312 (stack)
+- ✅ react, nextjs, python (stack)
 - ✅ security (domain)
 - ✅ context-monitor (meta)
 
@@ -561,9 +561,9 @@ Add section after "Skills":
 - `security`: OWASP Top 10, auth patterns
 
 **Stack Skills**:
-- `react-19`: React 19 with Server Components
-- `nextjs-15`: Next.js 15 App Router patterns
-- `python-312`: Python 3.12 best practices
+- `react`: React 19 with Server Components
+- `nextjs`: Next.js 15 App Router patterns
+- `python`: Python 3.12 best practices
 
 **Meta Skills**:
 - `context-monitor`: Context management

@@ -1,8 +1,7 @@
 ---
-name: react-19
-version: 19.0.0
-description: React 19 patterns with Server Components, Actions, and modern hooks. Use when writing React components, JSX files, or working with React-specific features.
-tags: [react, frontend, javascript, typescript, ui, components]
+name: react
+description: Modern React patterns with Server Components, Actions, and hooks. Use when writing React components, JSX files, or working with React-specific features.
+tags: [react, frontend, javascript, typescript, ui, components, server-components, hooks]
 author: dsmj-ai-toolkit
 metadata:
   auto_invoke: "Writing React components, JSX files, hooks, or React-specific code"
@@ -10,7 +9,7 @@ metadata:
   progressive_disclosure: true
 ---
 
-# React 19 Skill
+# React Skill
 
 Modern React patterns with Server Components, Server Actions, and concurrent features.
 

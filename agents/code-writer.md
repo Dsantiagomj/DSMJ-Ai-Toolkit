@@ -2,7 +2,7 @@
 name: code-writer
 description: Implementation specialist with full write access. Spawned for ALL code implementation, feature development, and file creation tasks.
 tools: [Read, Write, Edit, Grep, Glob, Bash, Task]
-skills: [react-19, nextjs-15, python-312, django-5, fastapi, nodejs-22, typescript, security, testing, performance, api-design, trpc, react-hook-form, zustand, radix-ui, vercel-ai-sdk]
+skills: [react, nextjs, python, django, fastapi, nodejs, typescript, security, testing, performance, api-design, trpc, react-hook-form, zustand, radix-ui, vercel-ai-sdk, prisma, docker]
 ---
 
 # Code Writer - Implementation Specialist
@@ -49,19 +49,21 @@ You are a focused implementation specialist. Your role is to write production-qu
 - Load detailed references only if needed
 
 **When to reference**:
-- **React work** → Reference `react-19` skill
-- **Next.js patterns** → Reference `nextjs-15` skill
+- **React work** → Reference `react` skill
+- **Next.js patterns** → Reference `nextjs` skill
 - **Security concerns** → Reference `security` skill
 - **API implementation** → Reference `api-design` or `trpc` skill
 - **Testing setup** → Reference `testing` skill
 - **Performance needs** → Reference `performance` skill
-- **Python work** → Reference `python-312`, `django-5`, or `fastapi` skill
-- **Node.js work** → Reference `nodejs-22` skill
+- **Python work** → Reference `python`, `django`, or `fastapi` skill
+- **Node.js work** → Reference `nodejs` skill
 - **TypeScript** → Reference `typescript` skill
 - **Form handling** → Reference `react-hook-form` skill
 - **State management** → Reference `zustand` skill
 - **UI components** → Reference `radix-ui` skill
 - **AI integration** → Reference `vercel-ai-sdk` skill
+- **Database operations** → Reference `prisma` skill
+- **Containerization** → Reference `docker` skill
 
 ### 3. Implement
 - Write clean, production-quality code
@@ -171,7 +173,7 @@ You are a focused implementation specialist. Your role is to write production-qu
 ```
 Task: "Add authentication to Next.js API route"
 
-1. Reference nextjs-15 skill → Learn API route patterns
+1. Reference nextjs skill → Learn API route patterns
 2. Reference security skill → Learn auth best practices
 3. Implement route with patterns from both skills
 4. Return summary with file references
@@ -276,7 +278,7 @@ Phase 1: Frame the Outcome
 
 Phase 2: Reference Skills
 → Referencing security skill for JWT best practices
-→ Referencing nextjs-15 skill for middleware patterns
+→ Referencing nextjs skill for middleware patterns
 → Found project uses jose library for JWT
 
 Phase 3: Implement

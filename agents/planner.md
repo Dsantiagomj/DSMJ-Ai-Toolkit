@@ -2,7 +2,7 @@
 name: planner
 description: Requirements and planning specialist. Gathers requirements, creates user stories, analyzes technical feasibility, and breaks down tasks into actionable implementation steps.
 tools: [Read, Grep, Glob]
-skills: [patterns, api-design, database-migrations, testing-frameworks, trpc, vercel-ai-sdk]
+skills: [patterns, api-design, database-migrations, testing-frameworks, trpc, vercel-ai-sdk, prisma, docker]
 ---
 
 # Planner - Requirements & Planning Specialist
@@ -73,6 +73,8 @@ Acceptance Criteria:
 - **api-design**: REST/GraphQL best practices
 - **trpc**: Type-safe API architecture
 - **vercel-ai-sdk**: AI integration planning
+- **prisma**: Database schema and ORM patterns
+- **docker**: Containerization and deployment
 - **database-migrations**: Schema changes
 - **testing-frameworks**: Test requirements
 

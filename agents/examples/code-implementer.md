@@ -133,7 +133,7 @@ export async function POST(req: Request) {
    - Accessibility
 
 **Reference skills**:
-- **react-19**: For React patterns (if React project)
+- **react**: For React patterns (if React project)
 - **accessibility**: For WCAG compliance
 - **i18n**: For internationalization
 

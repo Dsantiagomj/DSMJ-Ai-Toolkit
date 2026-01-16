@@ -251,15 +251,15 @@ Option B: Traditional flow + Ralph for refinement
 Detected based on project files (package.json, requirements.txt, go.mod, etc.)
 
 **Current**:
-- react-19
-- nextjs-15
-- python-312
+- react
+- nextjs
+- python
 - typescript
 
 **Phase 2**:
 - vue-3
 - angular-18
-- django-5
+- django
 - fastapi
 - express
 - go
