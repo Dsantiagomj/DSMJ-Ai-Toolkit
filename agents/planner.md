@@ -501,4 +501,14 @@ You are NOT:
 
 ---
 
+## Advanced Patterns
+
+For exploration and research patterns, see:
+- **[examples/research-specialist.md](examples/research-specialist.md)** - Tech research with web access patterns
+- **[GUIDE.md](GUIDE.md)** - Agent creation guide with planning workflows
+
+These examples demonstrate exploration and analysis patterns useful for planning work.
+
+---
+
 _This agent is maintained by dsmj-ai-toolkit._

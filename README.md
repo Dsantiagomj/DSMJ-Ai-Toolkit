@@ -11,7 +11,6 @@ A production-quality, reusable AI toolkit for Claude Code that adapts to differe
 - 📋 **Quality Gates**: Vibe Coding principles integrated (Frame → Scope → Generate → Review → Verify)
 - 🎨 **Maestro Mode**: Optional casual communication style (Spanish + English slangs)
 - 🛡️ **Security-First**: Built-in security best practices (OWASP Top 10, auth patterns)
-- 🔁 **Ralph Wiggum** (Optional): Iterative specialist for TDD, overnight builds, and task completion loops
 
 ## Quick Start
 
@@ -85,7 +84,7 @@ Frame outcome → Scope change → Generate → Review diff → Verify
 4. **Review & Verify**: Quality gates ensure code quality
 5. **Return Summary**: Clear file references and next steps
 
-### Agents (7 Total)
+### Agents (6 Total)
 
 **Core Agents** (Always Available):
 - **code-writer**: Implementation specialist - writes code only
@@ -98,7 +97,6 @@ Frame outcome → Scope change → Generate → Review diff → Verify
 
 **Optional Agents** (Specialized Needs):
 - **devops**: Operations specialist - CI/CD, monitoring, publishing, releases, SRE
-- **ralph-wiggum**: Iterative specialist - TDD loops, overnight builds, task completion
 
 **Agent Usage by Project Type**:
 | Project Type | Agents Needed | Count |
@@ -106,9 +104,6 @@ Frame outcome → Scope change → Generate → Review diff → Verify
 | Backend API | code-writer, code-reviewer, git-docs, planner | 4 |
 | Web App | + qa | 5 |
 | With CI/CD | + devops | 6 |
-| TDD/Overnight | + ralph-wiggum | 7 |
-
-See [docs/RALPH_WIGGUM_GUIDE.md](docs/RALPH_WIGGUM_GUIDE.md) for Ralph Wiggum usage guide.
 
 ### Skills
 
@@ -184,8 +179,7 @@ English slangs: bet, lowkey, ngl, fr, valid
 │   ├── git-docs.md            # Core: Git + documentation
 │   ├── planner.md             # Recommended: Planning
 │   ├── qa.md                  # Recommended: QA + UAT
-│   ├── devops.md              # Optional: Operations
-│   └── ralph-wiggum.md        # Optional: Iterative
+│   └── devops.md              # Optional: Operations
 ├── skills/
 │   ├── stack/
 │   │   ├── react-19/
@@ -210,7 +204,7 @@ my-project/
 │   │   ├── git-docs.md -> ~/.dsmj-ai-toolkit/agents/git-docs.md
 │   │   ├── planner.md -> ~/.dsmj-ai-toolkit/agents/planner.md
 │   │   ├── qa.md -> ~/.dsmj-ai-toolkit/agents/qa.md
-│   │   └── [optional: devops.md, ralph-wiggum.md]
+│   │   └── devops.md -> ~/.dsmj-ai-toolkit/agents/devops.md
 │   └── skills/                   # Symlinks to global
 │       ├── react-19 -> ~/.dsmj-ai-toolkit/skills/stack/react-19
 │       ├── security -> ~/.dsmj-ai-toolkit/skills/domain/security
@@ -229,10 +223,6 @@ dsmj-ai init
 
 # Show status
 dsmj-ai status
-
-# Run iterative task completion (if Ralph enabled)
-dsmj-ai ralph "Fix all TypeScript errors" 20 BUILD_SUCCESS
-dsmj-ai ralph "Implement auth with tests" 30 TESTS_PASSING
 
 # Update toolkit (WIP)
 dsmj-ai update
@@ -339,41 +329,6 @@ Main Claude:
 Result: Bug fixed, tested, committed
 ```
 
-### Iterative Task Completion (Ralph Wiggum)
-```
-User: "Fix all TypeScript errors and get clean build"
-User: dsmj-ai ralph "Fix all TypeScript errors" 30 BUILD_SUCCESS
-
-Main Claude:
-  1. Creates .ralph-prompt.md with task details
-  2. User spawns ralph-wiggum agent with prompt
-
-ralph-wiggum (Iteration 1):
-  1. Reads TypeScript errors (23 errors found)
-  2. Fixes first batch of type errors
-  3. Runs build → 15 errors remaining
-  4. Analyzes new errors
-
-ralph-wiggum (Iteration 2):
-  1. Fixes missing type definitions
-  2. Runs build → 8 errors remaining
-  3. Analyzes errors
-
-ralph-wiggum (Iteration 3):
-  1. Updates deprecated API usage
-  2. Runs build → 2 errors remaining
-  3. Analyzes errors
-
-ralph-wiggum (Iteration 4):
-  1. Fixes final edge cases
-  2. Runs build → SUCCESS!
-  3. Outputs: BUILD_SUCCESS
-
-Result: Wake up to zero TypeScript errors and clean build
-```
-
-See [docs/RALPH_WIGGUM_GUIDE.md](docs/RALPH_WIGGUM_GUIDE.md) for complete usage guide.
-
 ## Progressive Disclosure
 
 Skills use progressive disclosure to minimize context:
@@ -438,6 +393,35 @@ This breaks the symlink and creates a local copy you maintain.
 
 ⚠️ **Warning**: Custom agents won't receive toolkit updates!
 
+### Creating Custom Skills
+
+Want to create domain knowledge for your project? Skills system has you covered!
+
+**Quick Start**:
+```bash
+# Copy the template
+cp skills/TEMPLATE.md skills/domain/my-skill/SKILL.md
+
+# Edit and customize
+# See skills/GUIDE.md for complete instructions
+```
+
+**Resources**:
+- **[skills/TEMPLATE.md](skills/TEMPLATE.md)** - Blank template to copy
+- **[skills/GUIDE.md](skills/GUIDE.md)** - Complete creation guide with best practices
+- **[skills/examples/](skills/examples/)** - Working examples of different skill patterns:
+  - `minimal-skill.md` - Git conventions (simplest)
+  - `stack-skill.md` - Vue 3 Composition API (framework patterns)
+  - `domain-skill.md` - Testing patterns (cross-framework)
+  - `meta-skill.md` - Code review checklist (workflow)
+
+**See [skills/GUIDE.md](skills/GUIDE.md) for**:
+- YAML frontmatter rules and validation
+- Progressive disclosure patterns
+- Content structure guidelines
+- Stack vs Domain vs Meta categories
+- Quality standards and best practices
+
 ## Philosophy & Principles
 
 ### Core Beliefs
@@ -456,10 +440,10 @@ This breaks the symlink and creates a local copy you maintain.
 
 ### ✅ Phase 1: Core Architecture (Complete)
 - Main Claude orchestrator pattern
-- 7 specialized agents (core + recommended + optional)
+- 6 specialized agents (core + recommended + optional)
 - 3 core agents: code-writer, code-reviewer, git-docs
 - 2 recommended agents: planner, qa
-- 2 optional agents: devops, ralph-wiggum
+- 1 optional agent: devops
 - react-19 + security + context-monitor skills
 - CLAUDE.md with Prompt DNA + Maestro mode
 - Installation CLI with symlinks

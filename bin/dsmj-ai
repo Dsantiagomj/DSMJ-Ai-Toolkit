@@ -184,21 +184,6 @@ cmd_init() {
     done
     echo ""
 
-    # Ask about Ralph Wiggum (optional iterative agent)
-    echo ""
-    echo "Ralph Wiggum - Iterative Specialist (Optional)"
-    echo "Keeps working until task completion. Best for:"
-    echo "  - Overnight builds / TDD"
-    echo "  - Well-defined tasks with clear completion criteria"
-    echo "  - Iterative refinement until tests pass"
-    echo ""
-    read -p "Include Ralph Wiggum agent? (y/N): " -n 1 -r
-    echo ""
-    local include_ralph=false
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        include_ralph=true
-    fi
-
     # Create symlinks for agents
     info "Linking agents..."
     ln -sf "$TOOLKIT_DIR/agents/code-writer.md" ".claude/agents/code-writer.md"
@@ -207,10 +192,17 @@ cmd_init() {
     ln -sf "$TOOLKIT_DIR/agents/code-reviewer.md" ".claude/agents/code-reviewer.md"
     success "Linked code-reviewer.md"
 
-    if [[ "$include_ralph" = true ]]; then
-        ln -sf "$TOOLKIT_DIR/agents/ralph-wiggum.md" ".claude/agents/ralph-wiggum.md"
-        success "Linked ralph-wiggum.md"
-    fi
+    ln -sf "$TOOLKIT_DIR/agents/planner.md" ".claude/agents/planner.md"
+    success "Linked planner.md"
+
+    ln -sf "$TOOLKIT_DIR/agents/git-docs.md" ".claude/agents/git-docs.md"
+    success "Linked git-docs.md"
+
+    ln -sf "$TOOLKIT_DIR/agents/qa.md" ".claude/agents/qa.md"
+    success "Linked qa.md"
+
+    ln -sf "$TOOLKIT_DIR/agents/devops.md" ".claude/agents/devops.md"
+    success "Linked devops.md (optional)"
 
     # Create symlinks for skills
     info "Linking skills..."
@@ -385,118 +377,7 @@ cmd_update() {
 }
 
 ##############################################################################
-# Command: ralph (run Ralph Wiggum iterative loop)
 ##############################################################################
-cmd_ralph() {
-    if [[ ! -d ".claude" ]]; then
-        error "Not a dsmj-ai project. Run 'dsmj-ai init' first"
-        exit 1
-    fi
-
-    if [[ ! -f ".claude/agents/ralph-wiggum.md" ]]; then
-        error "Ralph Wiggum agent not installed"
-        info "Run 'dsmj-ai init' and select 'y' when asked about Ralph Wiggum"
-        info "Or manually link: ln -s ~/.dsmj-ai-toolkit/agents/ralph-wiggum.md .claude/agents/"
-        exit 1
-    fi
-
-    local prompt="${1:-}"
-    local max_iterations="${2:-30}"
-    local completion_phrase="${3:-TASK_COMPLETE}"
-
-    if [[ -z "$prompt" ]]; then
-        error "Prompt required"
-        echo ""
-        echo "Usage: dsmj-ai ralph <prompt> [max-iterations] [completion-phrase]"
-        echo ""
-        echo "Examples:"
-        echo "  dsmj-ai ralph \"Fix all TypeScript errors\" 20 BUILD_SUCCESS"
-        echo "  dsmj-ai ralph \"Implement auth with passing tests\" 30 TESTS_PASSING"
-        echo ""
-        exit 1
-    fi
-
-    info "Starting Ralph Wiggum iterative loop..."
-    echo ""
-    echo "Task: $prompt"
-    echo "Max iterations: $max_iterations"
-    echo "Completion phrase: $completion_phrase"
-    echo ""
-    warn "Ralph will keep iterating until completion or max iterations reached"
-    warn "Press Ctrl+C to stop manually"
-    echo ""
-    read -p "Continue? (y/N): " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        info "Cancelled"
-        exit 0
-    fi
-
-    # Create temporary prompt file
-    local prompt_file=".ralph-prompt.md"
-    cat > "$prompt_file" << EOF
-# Ralph Wiggum Iterative Task
-
-**Your role**: You are Ralph Wiggum, the iterative specialist. Keep working until completion.
-
-## Task
-$prompt
-
-## Completion Criteria
-You must output exactly this phrase when done:
-\`\`\`
-$completion_phrase
-\`\`\`
-
-## Instructions
-1. Attempt to complete the task
-2. Verify completion (run tests, build, check files, etc.)
-3. If NOT complete:
-   - Analyze what failed
-   - Learn from the failure
-   - Try a different approach
-   - DO NOT output completion phrase yet
-4. If complete and verified:
-   - Output completion summary
-   - Output the exact completion phrase: $completion_phrase
-5. Keep iterating until completion or you're truly stuck
-
-## Iteration Limit
-Maximum iterations: $max_iterations
-
-If you reach the limit without completion, output:
-\`\`\`
-INCOMPLETE - [brief reason]
-\`\`\`
-
-## Remember
-- Verify after each change (don't assume)
-- Learn from failures (don't repeat failed approaches)
-- Make incremental progress
-- Output $completion_phrase ONLY when truly complete
-EOF
-
-    success "Created prompt file: $prompt_file"
-    echo ""
-
-    # Note: The actual iterative loop would be implemented by Claude Code's task system
-    # For now, we just show the prompt and instructions
-    info "To run Ralph Wiggum loop manually:"
-    echo ""
-    echo "1. Start Claude Code in this directory"
-    echo "2. Use the Task tool to spawn ralph-wiggum agent with this prompt:"
-    echo "   cat $prompt_file"
-    echo ""
-    echo "3. Ralph will iterate until completion"
-    echo ""
-    warn "Automated loop (while :; do cat PROMPT.md | claude ; done) requires"
-    warn "Claude Code CLI integration - coming in future update"
-    echo ""
-    info "For now, use manual iteration:"
-    echo "  - Spawn ralph-wiggum via Task tool"
-    echo "  - It will work until complete or stuck"
-    echo "  - Re-spawn if needed with same prompt"
-}
 
 ##############################################################################
 # Command: status (show installation status)
@@ -555,7 +436,6 @@ USAGE:
 COMMANDS:
     install     Install toolkit globally (~/.dsmj-ai-toolkit/)
     init        Initialize current project with interactive wizard
-    ralph       Run Ralph Wiggum iterative loop for task completion
     sync        Resync skills based on current stack (WIP)
     update      Update global toolkit (WIP)
     status      Show installation and project status
@@ -569,10 +449,6 @@ EXAMPLES:
     # Initialize a project
     cd my-project
     dsmj-ai init
-
-    # Run iterative task completion (if Ralph Wiggum enabled)
-    dsmj-ai ralph "Fix all TypeScript errors" 20 BUILD_SUCCESS
-    dsmj-ai ralph "Implement auth with tests" 30 TESTS_PASSING
 
     # Check status
     dsmj-ai status
@@ -593,10 +469,6 @@ main() {
             ;;
         init)
             cmd_init
-            ;;
-        ralph)
-            shift  # Remove 'ralph' from arguments
-            cmd_ralph "$@"
             ;;
         sync)
             cmd_sync
