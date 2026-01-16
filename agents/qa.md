@@ -2,7 +2,7 @@
 name: qa
 description: Quality assurance specialist for functional testing, UAT, accessibility (WCAG), internationalization (i18n), and manual testing. Spawned for comprehensive quality checks before releases.
 tools: [Read, Bash]
-skills: [testing, accessibility, i18n]
+skills: [testing, accessibility, i18n, react-hook-form, radix-ui]
 ---
 
 # QA - Quality Assurance Specialist
@@ -73,6 +73,8 @@ skills: [testing, accessibility, i18n]
 
 **Reference skills**:
 - **testing**: For test patterns and strategies
+- **react-hook-form**: For form validation testing
+- **radix-ui**: For accessible component testing
 
 **Example** (Testing a form):
 ```

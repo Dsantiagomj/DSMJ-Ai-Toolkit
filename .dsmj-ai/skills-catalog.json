@@ -3,6 +3,66 @@
   "lastUpdated": "2026-01-15",
   "skills": [
     {
+      "name": "dsmj/trpc",
+      "displayName": "tRPC",
+      "category": "backend",
+      "description": "Type-safe APIs with tRPC - End-to-end typesafe APIs without code generation",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer", "planner"],
+      "tags": ["trpc", "api", "typescript", "type-safety", "react-query", "nextjs"],
+      "installed": true
+    },
+    {
+      "name": "dsmj/react-hook-form",
+      "displayName": "React Hook Form",
+      "category": "web-development",
+      "description": "Performant form management with React Hook Form",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer", "qa"],
+      "tags": ["forms", "react-hook-form", "validation", "zod", "typescript", "react"],
+      "installed": true
+    },
+    {
+      "name": "dsmj/zustand",
+      "displayName": "Zustand",
+      "category": "web-development",
+      "description": "Minimalist state management with Zustand",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer"],
+      "tags": ["zustand", "state-management", "react", "typescript", "hooks"],
+      "installed": true
+    },
+    {
+      "name": "dsmj/radix-ui",
+      "displayName": "Radix UI",
+      "category": "ui-components",
+      "description": "Accessible headless UI components with Radix UI",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer", "qa"],
+      "tags": ["radix-ui", "react", "accessibility", "headless-ui", "components", "a11y"],
+      "installed": true
+    },
+    {
+      "name": "dsmj/vercel-ai-sdk",
+      "displayName": "Vercel AI SDK",
+      "category": "backend",
+      "description": "AI integration with Vercel AI SDK - Build AI-powered applications",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer", "planner"],
+      "tags": ["ai", "vercel", "openai", "streaming", "llm", "react", "nextjs"],
+      "installed": true
+    },
+    {
       "name": "anthropics/react",
       "displayName": "React",
       "category": "web-development",

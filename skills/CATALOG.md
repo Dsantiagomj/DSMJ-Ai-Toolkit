@@ -1,8 +1,8 @@
 # Skills Catalog - Community Skills Reference
 
-**142+ community skills for Claude Code agents**
+**147+ skills for Claude Code agents** (5 local + 142 community)
 
-This catalog organizes skills from the [awesome-claude-skills](https://github.com/VoltAgent/awesome-claude-skills) ecosystem, categorized by agent and use case.
+This catalog includes local stack-specific skills and organizes community skills from the [awesome-claude-skills](https://github.com/VoltAgent/awesome-claude-skills) ecosystem.
 
 ---
 
@@ -27,7 +27,44 @@ git clone https://github.com/<org>/<skill-name>
 
 ---
 
-## Skills by Agent
+## Local Skills (Pre-installed)
+
+These skills are maintained locally and pre-installed in your toolkit. They focus on modern full-stack development patterns.
+
+### Stack Skills
+
+**API & Backend**:
+- **trpc** - Type-safe APIs with tRPC (Context7: /websites/trpc_io)
+  - End-to-end typesafe APIs without code generation
+  - React Query integration, middleware, Zod validation
+  - For: code-writer, planner
+
+- **vercel-ai-sdk** - AI integration with Vercel AI SDK (Context7: /websites/ai-sdk_dev)
+  - Streaming responses, function calling, structured outputs
+  - React hooks (useChat, useCompletion, useAssistant)
+  - For: code-writer, planner
+
+**Frontend**:
+- **react-hook-form** - Form management (Context7: /react-hook-form/documentation)
+  - Performant forms with Zod validation
+  - Field arrays, controlled components, shadcn integration
+  - For: code-writer, qa
+
+- **zustand** - State management (Context7: /websites/zustand_pmnd_rs)
+  - Minimalist, fast state management
+  - Middleware (persist, devtools, immer), TypeScript patterns
+  - For: code-writer
+
+- **radix-ui** - Headless UI components (Context7: /websites/radix-ui)
+  - Accessible, unstyled primitives
+  - Dialog, Dropdown, Select, Tabs, etc.
+  - For: code-writer, qa
+
+All local skills include Context7 references for up-to-date documentation.
+
+---
+
+## Community Skills by Agent
 
 ### Code Writer (Implementation)
 
