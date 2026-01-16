@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastUpdated": "2026-01-15",
+  "lastUpdated": "2026-01-16",
   "skills": [
     {
       "name": "dsmj/trpc",
@@ -84,6 +84,18 @@
       "official": false,
       "agents": ["code-writer", "planner", "devops"],
       "tags": ["docker", "containers", "devops", "deployment", "docker-compose"],
+      "installed": true
+    },
+    {
+      "name": "dsmj/typescript",
+      "displayName": "TypeScript",
+      "category": "web-development",
+      "description": "TypeScript type system for type-safe JavaScript - Covers both frontend and backend",
+      "source": "local",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-writer", "planner"],
+      "tags": ["typescript", "types", "javascript", "fullstack", "static-typing", "type-safety"],
       "installed": true
     },
     {
