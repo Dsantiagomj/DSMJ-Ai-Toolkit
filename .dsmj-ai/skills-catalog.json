@@ -1,0 +1,350 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-15",
+  "skills": [
+    {
+      "name": "anthropics/react",
+      "displayName": "React",
+      "category": "web-development",
+      "description": "React development patterns and best practices",
+      "source": "https://github.com/anthropics/react",
+      "compatibility": "verified",
+      "official": true,
+      "agents": ["code-writer"],
+      "tags": ["react", "frontend", "javascript", "typescript"],
+      "installed": false
+    },
+    {
+      "name": "anthropics/tailwind-css",
+      "displayName": "Tailwind CSS",
+      "category": "styling",
+      "description": "Tailwind CSS styling patterns and utilities",
+      "source": "https://github.com/anthropics/tailwind-css",
+      "compatibility": "verified",
+      "official": true,
+      "agents": ["code-writer", "qa"],
+      "tags": ["tailwind", "css", "styling", "frontend"],
+      "installed": false
+    },
+    {
+      "name": "anthropics/shadcn",
+      "displayName": "shadcn/ui",
+      "category": "ui-components",
+      "description": "shadcn/ui component library patterns",
+      "source": "https://github.com/anthropics/shadcn",
+      "compatibility": "verified",
+      "official": true,
+      "agents": ["code-writer"],
+      "tags": ["shadcn", "components", "ui", "react"],
+      "installed": false
+    },
+    {
+      "name": "anthropics/supabase",
+      "displayName": "Supabase",
+      "category": "backend",
+      "description": "Supabase backend development",
+      "source": "https://github.com/anthropics/supabase",
+      "compatibility": "verified",
+      "official": true,
+      "agents": ["code-writer", "planner"],
+      "tags": ["supabase", "backend", "database", "auth"],
+      "installed": false
+    },
+    {
+      "name": "anthropics/webapp-testing",
+      "displayName": "Web App Testing",
+      "category": "testing",
+      "description": "Web application testing patterns and strategies",
+      "source": "https://github.com/anthropics/webapp-testing",
+      "compatibility": "verified",
+      "official": true,
+      "agents": ["qa", "code-reviewer"],
+      "tags": ["testing", "qa", "web", "e2e"],
+      "installed": false
+    },
+    {
+      "name": "anthropics/c4-diagrams",
+      "displayName": "C4 Diagrams",
+      "category": "documentation",
+      "description": "C4 architecture diagram generation",
+      "source": "https://github.com/anthropics/c4-diagrams",
+      "compatibility": "verified",
+      "official": true,
+      "agents": ["planner", "git-docs"],
+      "tags": ["diagrams", "architecture", "documentation"],
+      "installed": false
+    },
+    {
+      "name": "getsentry/code-review",
+      "displayName": "Code Review",
+      "category": "code-quality",
+      "description": "Comprehensive code review best practices",
+      "source": "https://github.com/getsentry/code-review",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-reviewer"],
+      "tags": ["code-review", "quality", "best-practices"],
+      "installed": false
+    },
+    {
+      "name": "getsentry/commit",
+      "displayName": "Commit Standards",
+      "category": "git",
+      "description": "Git commit message standards and conventions",
+      "source": "https://github.com/getsentry/commit",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["git-docs"],
+      "tags": ["git", "commits", "conventional-commits"],
+      "installed": false
+    },
+    {
+      "name": "getsentry/create-pr",
+      "displayName": "Create Pull Request",
+      "category": "git",
+      "description": "Pull request creation best practices",
+      "source": "https://github.com/getsentry/create-pr",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["git-docs"],
+      "tags": ["git", "pull-request", "pr"],
+      "installed": false
+    },
+    {
+      "name": "getsentry/lint",
+      "displayName": "Linting",
+      "category": "code-quality",
+      "description": "Linting best practices and configurations",
+      "source": "https://github.com/getsentry/lint",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-reviewer"],
+      "tags": ["linting", "code-quality", "eslint"],
+      "installed": false
+    },
+    {
+      "name": "getsentry/technical-writing",
+      "displayName": "Technical Writing",
+      "category": "documentation",
+      "description": "Technical writing and documentation standards",
+      "source": "https://github.com/getsentry/technical-writing",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["git-docs", "planner"],
+      "tags": ["documentation", "writing", "technical"],
+      "installed": false
+    },
+    {
+      "name": "vercel-labs/vercel-deploy-claimable",
+      "displayName": "Vercel Deploy",
+      "category": "deployment",
+      "description": "Vercel deployment automation",
+      "source": "https://github.com/vercel-labs/vercel-deploy-claimable",
+      "compatibility": "verified",
+      "official": true,
+      "agents": ["devops"],
+      "tags": ["vercel", "deployment", "hosting"],
+      "installed": false
+    },
+    {
+      "name": "trailofbits/static-analysis",
+      "displayName": "Static Analysis",
+      "category": "security",
+      "description": "Static code analysis for security",
+      "source": "https://github.com/trailofbits/static-analysis",
+      "compatibility": "verified",
+      "official": false,
+      "agents": ["code-reviewer"],
+      "tags": ["security", "static-analysis", "code-quality"],
+      "installed": false
+    },
+    {
+      "name": "obra/test-driven-development",
+      "displayName": "Test-Driven Development",
+      "category": "testing",
+      "description": "TDD best practices and patterns",
+      "source": "https://github.com/obra/test-driven-development",
+      "compatibility": "untested",
+      "official": false,
+      "agents": ["code-writer", "qa"],
+      "tags": ["tdd", "testing", "best-practices"],
+      "installed": false
+    },
+    {
+      "name": "obra/testing-anti-patterns",
+      "displayName": "Testing Anti-Patterns",
+      "category": "testing",
+      "description": "Common testing mistakes to avoid",
+      "source": "https://github.com/obra/testing-anti-patterns",
+      "compatibility": "untested",
+      "official": false,
+      "agents": ["qa", "code-reviewer"],
+      "tags": ["testing", "anti-patterns", "best-practices"],
+      "installed": false
+    },
+    {
+      "name": "janpio/expo",
+      "displayName": "Expo",
+      "category": "mobile",
+      "description": "Expo React Native development",
+      "source": "https://github.com/janpio/expo",
+      "compatibility": "untested",
+      "official": false,
+      "agents": ["code-writer"],
+      "tags": ["expo", "react-native", "mobile"],
+      "installed": false
+    },
+    {
+      "name": "janpio/flutter",
+      "displayName": "Flutter",
+      "category": "mobile",
+      "description": "Flutter mobile development",
+      "source": "https://github.com/janpio/flutter",
+      "compatibility": "untested",
+      "official": false,
+      "agents": ["code-writer"],
+      "tags": ["flutter", "mobile", "dart"],
+      "installed": false
+    },
+    {
+      "name": "zxkane/aws-skills",
+      "displayName": "AWS",
+      "category": "cloud",
+      "description": "AWS cloud deployment and services",
+      "source": "https://github.com/zxkane/aws-skills",
+      "compatibility": "untested",
+      "official": false,
+      "agents": ["devops"],
+      "tags": ["aws", "cloud", "deployment"],
+      "installed": false
+    },
+    {
+      "name": "ilyagru/react-aria",
+      "displayName": "React Aria",
+      "category": "accessibility",
+      "description": "Adobe React Aria accessibility patterns",
+      "source": "https://github.com/ilyagru/react-aria",
+      "compatibility": "untested",
+      "official": false,
+      "agents": ["code-writer", "qa"],
+      "tags": ["accessibility", "react", "aria"],
+      "installed": false
+    },
+    {
+      "name": "aaronsteers/postgres-development",
+      "displayName": "PostgreSQL",
+      "category": "database",
+      "description": "PostgreSQL database development",
+      "source": "https://github.com/aaronsteers/postgres-development",
+      "compatibility": "untested",
+      "official": false,
+      "agents": ["code-writer", "planner"],
+      "tags": ["postgresql", "database", "sql"],
+      "installed": false
+    }
+  ],
+  "categories": [
+    {
+      "id": "web-development",
+      "name": "Web Development",
+      "description": "Frontend and full-stack web development"
+    },
+    {
+      "id": "backend",
+      "name": "Backend",
+      "description": "Server-side development and APIs"
+    },
+    {
+      "id": "testing",
+      "name": "Testing & QA",
+      "description": "Testing frameworks and quality assurance"
+    },
+    {
+      "id": "deployment",
+      "name": "Deployment",
+      "description": "CI/CD and hosting platforms"
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "description": "Security analysis and best practices"
+    },
+    {
+      "id": "documentation",
+      "name": "Documentation",
+      "description": "Technical writing and diagrams"
+    },
+    {
+      "id": "mobile",
+      "name": "Mobile Development",
+      "description": "iOS, Android, and cross-platform mobile"
+    },
+    {
+      "id": "cloud",
+      "name": "Cloud & DevOps",
+      "description": "Cloud platforms and infrastructure"
+    },
+    {
+      "id": "styling",
+      "name": "Styling",
+      "description": "CSS frameworks and styling libraries"
+    },
+    {
+      "id": "accessibility",
+      "name": "Accessibility",
+      "description": "Web accessibility and WCAG compliance"
+    },
+    {
+      "id": "database",
+      "name": "Database",
+      "description": "Database development and management"
+    },
+    {
+      "id": "code-quality",
+      "name": "Code Quality",
+      "description": "Code review, linting, and best practices"
+    },
+    {
+      "id": "git",
+      "name": "Version Control",
+      "description": "Git workflows and conventions"
+    },
+    {
+      "id": "ui-components",
+      "name": "UI Components",
+      "description": "Component libraries and design systems"
+    }
+  ],
+  "agents": [
+    {
+      "id": "code-writer",
+      "name": "Code Writer",
+      "description": "Implementation and development"
+    },
+    {
+      "id": "code-reviewer",
+      "name": "Code Reviewer",
+      "description": "Code quality and security review"
+    },
+    {
+      "id": "planner",
+      "name": "Planner",
+      "description": "Architecture and planning"
+    },
+    {
+      "id": "git-docs",
+      "name": "Git Docs",
+      "description": "Git workflow and documentation"
+    },
+    {
+      "id": "qa",
+      "name": "QA",
+      "description": "Quality assurance and testing"
+    },
+    {
+      "id": "devops",
+      "name": "DevOps",
+      "description": "Deployment and operations"
+    }
+  ]
+}
