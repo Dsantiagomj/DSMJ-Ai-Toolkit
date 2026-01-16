@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # Get commits since last tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"- %s (%h)" ${PREV_TAG}..HEAD)
+          fi
+
+          # Create release notes
+          cat > release_notes.md << EOF
+          ## dsmj-ai-toolkit v${{ steps.get_version.outputs.VERSION }}
+
+          ### Installation
+
+          **Quick install (recommended):**
+          \`\`\`bash
+          curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/install.sh | bash
+          \`\`\`
+
+          **Homebrew:**
+          \`\`\`bash
+          brew tap dsantiagomj/dsmj-ai
+          brew install dsmj-ai-toolkit
+          \`\`\`
+
+          **Manual installation:**
+          \`\`\`bash
+          git clone https://github.com/dsantiagomj/dsmj-ai-toolkit.git
+          cd dsmj-ai-toolkit
+          ./bin/dsmj-ai install
+          \`\`\`
+
+          ### Changes
+
+          $COMMITS
+
+          ### Usage
+
+          After installation:
+          \`\`\`bash
+          cd your-project
+          dsmj-ai init
+          \`\`\`
+
+          For more information, see the [README](https://github.com/dsantiagomj/dsmj-ai-toolkit/blob/main/README.md).
+          EOF
+
+      - name: Create release archive
+        run: |
+          # Create tarball excluding .git and other unnecessary files
+          tar -czf dsmj-ai-toolkit-v${{ steps.get_version.outputs.VERSION }}.tar.gz \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.DS_Store' \
+            --transform 's,^,dsmj-ai-toolkit/,' \
+            agents/ skills/ templates/ bin/ .dsmj-ai/ install.sh uninstall.sh README.md LICENSE 2>/dev/null || true
+
+      - name: Calculate SHA256
+        id: sha256
+        run: |
+          SHA256=$(shasum -a 256 dsmj-ai-toolkit-v${{ steps.get_version.outputs.VERSION }}.tar.gz | awk '{print $1}')
+          echo "SHA256=$SHA256" >> $GITHUB_OUTPUT
+          echo "SHA256: $SHA256"
+
+      - name: Update Homebrew formula
+        run: |
+          sed -i "s/sha256 \".*\"/sha256 \"${{ steps.sha256.outputs.SHA256 }}\"/" homebrew/dsmj-ai-toolkit.rb
+          sed -i "s/version \".*\"/version \"${{ steps.get_version.outputs.VERSION }}\"/" homebrew/dsmj-ai-toolkit.rb
+          sed -i "s|url \".*\"|url \"https://github.com/dsantiagomj/dsmj-ai-toolkit/archive/refs/tags/v${{ steps.get_version.outputs.VERSION }}.tar.gz\"|" homebrew/dsmj-ai-toolkit.rb
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release_notes.md
+          files: |
+            dsmj-ai-toolkit-v${{ steps.get_version.outputs.VERSION }}.tar.gz
+            install.sh
+            uninstall.sh
+            homebrew/dsmj-ai-toolkit.rb
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload formula to releases
+        run: |
+          echo "✓ Release created successfully!"
+          echo "✓ Homebrew formula updated"
+          echo ""
+          echo "Next steps:"
+          echo "1. Update your homebrew tap repository with the new formula"
+          echo "2. Test installation: curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/install.sh | bash"

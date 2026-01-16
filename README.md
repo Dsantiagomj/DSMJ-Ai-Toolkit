@@ -16,6 +16,23 @@ A production-quality, reusable AI toolkit for Claude Code that adapts to differe
 
 ### Installation
 
+**Option 1: Quick Install (Recommended)**
+```bash
+# One-command installation via curl
+curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/install.sh | bash
+
+# Restart your terminal or reload shell
+source ~/.zshrc  # or ~/.bashrc
+```
+
+**Option 2: Homebrew** (Coming Soon)
+```bash
+# Via Homebrew tap
+brew tap dsantiagomj/dsmj-ai
+brew install dsmj-ai-toolkit
+```
+
+**Option 3: Manual Installation**
 ```bash
 # Clone the repository
 git clone https://github.com/dsantiagomj/dsmj-ai-toolkit.git
@@ -26,6 +43,15 @@ cd dsmj-ai-toolkit
 
 # Add to PATH (or restart terminal)
 source ~/.zshrc  # or ~/.bashrc
+```
+
+**Uninstall**
+```bash
+# Remove toolkit completely
+curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/uninstall.sh | bash
+
+# Or if already installed
+bash ~/.dsmj-ai-toolkit/uninstall.sh
 ```
 
 ### Initialize a Project
@@ -456,12 +482,16 @@ cp skills/TEMPLATE.md skills/domain/my-skill/SKILL.md
 - Context7 MCP integration examples
 - Agent usage analytics and insights
 
-### 🔲 Phase 3: Team & Distribution
-- Team conventions sync
-- Shared skill libraries across teams
-- Multi-project management dashboard
-- Homebrew distribution
-- Project templates (backend, fullstack, mobile)
+### 🚀 Phase 3: Distribution & Publishing (In Progress)
+- ✅ curl installation script
+- ✅ Uninstall script
+- ✅ GitHub releases workflow
+- ✅ Homebrew formula
+- 🔲 Homebrew tap repository
+- 🔲 NPM package (for Node.js projects)
+- 🔲 Team conventions sync
+- 🔲 Shared skill libraries across teams
+- 🔲 Project templates (backend, fullstack, mobile)
 
 ### 🔲 Phase 4: Advanced Features
 - Custom skill creation wizard
