@@ -417,6 +417,314 @@ cmd_status() {
 }
 
 ##############################################################################
+# Command: skills (skill management)
+##############################################################################
+
+# Skills catalog path
+SKILLS_CATALOG="$TOOLKIT_DIR/.dsmj-ai/skills-catalog.json"
+
+cmd_skills() {
+    local subcommand="${1:-help}"
+    shift || true
+
+    case "$subcommand" in
+        list)
+            skills_list "$@"
+            ;;
+        search)
+            skills_search "$@"
+            ;;
+        info)
+            skills_info "$@"
+            ;;
+        install)
+            skills_install "$@"
+            ;;
+        uninstall)
+            skills_uninstall "$@"
+            ;;
+        help|--help|-h)
+            skills_help
+            ;;
+        *)
+            error "Unknown skills subcommand: $subcommand"
+            echo ""
+            skills_help
+            exit 1
+            ;;
+    esac
+}
+
+skills_list() {
+    local filter=""
+    local show_installed=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --installed)
+                show_installed=true
+                shift
+                ;;
+            *)
+                filter="$1"
+                shift
+                ;;
+        esac
+    done
+
+    if [[ ! -f "$SKILLS_CATALOG" ]]; then
+        error "Skills catalog not found"
+        info "Run 'dsmj-ai install' to set up the toolkit"
+        exit 1
+    fi
+
+    info "Available Skills:"
+    echo ""
+
+    # Use jq if available, otherwise use grep/awk
+    if command -v jq &> /dev/null; then
+        jq -r '.skills[] |
+            select(
+                (if $installed then .installed == true else true end) and
+                (if $filter != "" then (.name | contains($filter)) or (.category | contains($filter)) or (.tags | map(. | contains($filter)) | any) else true end)
+            ) |
+            "\(.name)\t\(.displayName)\t\(.category)\t\(if .official then "⭐" else "" end)"' \
+            --arg installed "$show_installed" \
+            --arg filter "$filter" \
+            "$SKILLS_CATALOG" | \
+        while IFS=$'\t' read -r name display category official; do
+            printf "  ${BLUE}%-35s${NC} ${GREEN}%s${NC} ${YELLOW}[%s]${NC} %s\n" "$name" "$display" "$category" "$official"
+        done
+    else
+        warn "Install 'jq' for better formatting"
+        cat "$SKILLS_CATALOG" | grep -E '"name"|"displayName"' | sed 'N;s/\n/ /'
+    fi
+
+    echo ""
+    info "Use 'dsmj-ai skills info <name>' for details"
+    info "Use 'dsmj-ai skills install <name>' to install"
+}
+
+skills_search() {
+    local query="$1"
+
+    if [[ -z "$query" ]]; then
+        error "Usage: dsmj-ai skills search <keyword>"
+        exit 1
+    fi
+
+    info "Searching for: $query"
+    echo ""
+
+    if command -v jq &> /dev/null; then
+        local count=$(jq -r --arg q "$query" '[.skills[] |
+            select(
+                (.name | contains($q)) or
+                (.displayName | contains($q)) or
+                (.description | contains($q)) or
+                (.category | contains($q)) or
+                (.tags | map(. | contains($q)) | any)
+            )] | length' "$SKILLS_CATALOG")
+
+        if [[ "$count" -eq 0 ]]; then
+            warn "No skills found matching '$query'"
+            exit 0
+        fi
+
+        jq -r --arg q "$query" '.skills[] |
+            select(
+                (.name | contains($q)) or
+                (.displayName | contains($q)) or
+                (.description | contains($q)) or
+                (.category | contains($q)) or
+                (.tags | map(. | contains($q)) | any)
+            ) |
+            "\(.name)\t\(.displayName)\t\(.description)\t\(if .official then "⭐" else "" end)"' \
+            "$SKILLS_CATALOG" | \
+        while IFS=$'\t' read -r name display desc official; do
+            echo -e "  ${BLUE}$name${NC} ${GREEN}$display${NC} $official"
+            echo -e "    $desc"
+            echo ""
+        done
+
+        success "Found $count skill(s)"
+    else
+        warn "Install 'jq' for search functionality"
+        exit 1
+    fi
+}
+
+skills_info() {
+    local skill_name="$1"
+
+    if [[ -z "$skill_name" ]]; then
+        error "Usage: dsmj-ai skills info <skill-name>"
+        exit 1
+    fi
+
+    if command -v jq &> /dev/null; then
+        local skill_json=$(jq -r --arg name "$skill_name" '.skills[] | select(.name == $name)' "$SKILLS_CATALOG")
+
+        if [[ -z "$skill_json" ]]; then
+            error "Skill not found: $skill_name"
+            info "Use 'dsmj-ai skills list' to see available skills"
+            exit 1
+        fi
+
+        local display_name=$(echo "$skill_json" | jq -r '.displayName')
+        local description=$(echo "$skill_json" | jq -r '.description')
+        local category=$(echo "$skill_json" | jq -r '.category')
+        local source=$(echo "$skill_json" | jq -r '.source')
+        local compatibility=$(echo "$skill_json" | jq -r '.compatibility')
+        local official=$(echo "$skill_json" | jq -r '.official')
+        local agents=$(echo "$skill_json" | jq -r '.agents | join(", ")')
+        local tags=$(echo "$skill_json" | jq -r '.tags | join(", ")')
+        local installed=$(echo "$skill_json" | jq -r '.installed')
+
+        echo ""
+        echo -e "${BLUE}$skill_name${NC}"
+        echo -e "${GREEN}$display_name${NC}"
+        if [[ "$official" == "true" ]]; then
+            echo -e "⭐ Official Anthropic Skill"
+        fi
+        echo ""
+        echo "Description: $description"
+        echo "Category:    $category"
+        echo "Agents:      $agents"
+        echo "Tags:        $tags"
+        echo "Source:      $source"
+        echo "Status:      $compatibility"
+        if [[ "$installed" == "true" ]]; then
+            echo -e "Installed:   ${GREEN}Yes${NC}"
+        else
+            echo -e "Installed:   ${YELLOW}No${NC}"
+        fi
+        echo ""
+    else
+        warn "Install 'jq' to view skill info"
+        exit 1
+    fi
+}
+
+skills_install() {
+    local skill_name="$1"
+
+    if [[ -z "$skill_name" ]]; then
+        error "Usage: dsmj-ai skills install <skill-name>"
+        exit 1
+    fi
+
+    # Check if current directory is a project
+    if [[ ! -d ".claude" ]]; then
+        error "Not a dsmj-ai project"
+        info "Run 'dsmj-ai init' first or cd into a project directory"
+        exit 1
+    fi
+
+    info "Installing skill: $skill_name"
+
+    if command -v jq &> /dev/null; then
+        local skill_json=$(jq -r --arg name "$skill_name" '.skills[] | select(.name == $name)' "$SKILLS_CATALOG")
+
+        if [[ -z "$skill_json" ]]; then
+            error "Skill not found: $skill_name"
+            info "Use 'dsmj-ai skills list' to see available skills"
+            exit 1
+        fi
+
+        local source=$(echo "$skill_json" | jq -r '.source')
+        local display_name=$(echo "$skill_json" | jq -r '.displayName')
+
+        # Check if already installed
+        local installed=$(echo "$skill_json" | jq -r '.installed')
+        if [[ "$installed" == "true" ]] && [[ -d ".claude/skills/$(basename $skill_name)" ]]; then
+            warn "Skill already installed: $display_name"
+            return 0
+        fi
+
+        mkdir -p ".claude/skills"
+
+        info "Cloning from $source..."
+
+        # Clone the skill repository
+        local skill_dir=".claude/skills/$(basename $skill_name)"
+        if git clone --depth 1 "$source" "$skill_dir" 2>/dev/null; then
+            # Remove .git directory to save space
+            rm -rf "$skill_dir/.git"
+
+            success "Installed: $display_name"
+            info "Skill available at: $skill_dir"
+        else
+            error "Failed to clone skill from $source"
+            info "The repository may not exist or you may need to check your internet connection"
+            exit 1
+        fi
+    else
+        error "Install 'jq' to use skill management"
+        exit 1
+    fi
+}
+
+skills_uninstall() {
+    local skill_name="$1"
+
+    if [[ -z "$skill_name" ]]; then
+        error "Usage: dsmj-ai skills uninstall <skill-name>"
+        exit 1
+    fi
+
+    if [[ ! -d ".claude" ]]; then
+        error "Not a dsmj-ai project"
+        exit 1
+    fi
+
+    local skill_dir=".claude/skills/$(basename $skill_name)"
+
+    if [[ ! -d "$skill_dir" ]]; then
+        warn "Skill not installed: $skill_name"
+        exit 0
+    fi
+
+    info "Uninstalling: $skill_name"
+    rm -rf "$skill_dir"
+    success "Uninstalled: $skill_name"
+}
+
+skills_help() {
+    cat << EOF
+dsmj-ai skills - Skill Management
+
+USAGE:
+    dsmj-ai skills <subcommand> [options]
+
+SUBCOMMANDS:
+    list [--installed]     List available skills
+    search <keyword>       Search skills by keyword
+    info <skill-name>      Show detailed skill information
+    install <skill-name>   Install a skill to current project
+    uninstall <skill-name> Uninstall a skill from current project
+    help                   Show this help message
+
+EXAMPLES:
+    # List all available skills
+    dsmj-ai skills list
+
+    # Search for React skills
+    dsmj-ai skills search react
+
+    # Get info about a specific skill
+    dsmj-ai skills info anthropics/react
+
+    # Install a skill
+    dsmj-ai skills install anthropics/react
+
+    # Uninstall a skill
+    dsmj-ai skills uninstall anthropics/react
+
+EOF
+}
+
+##############################################################################
 # Command: version
 ##############################################################################
 cmd_version() {
@@ -436,6 +744,7 @@ USAGE:
 COMMANDS:
     install     Install toolkit globally (~/.dsmj-ai-toolkit/)
     init        Initialize current project with interactive wizard
+    skills      Manage community skills (list, search, install, uninstall)
     sync        Resync skills based on current stack (WIP)
     update      Update global toolkit (WIP)
     status      Show installation and project status
@@ -450,6 +759,11 @@ EXAMPLES:
     cd my-project
     dsmj-ai init
 
+    # Manage skills
+    dsmj-ai skills list
+    dsmj-ai skills search react
+    dsmj-ai skills install anthropics/react
+
     # Check status
     dsmj-ai status
 
@@ -462,6 +776,7 @@ EOF
 ##############################################################################
 main() {
     local command="${1:-help}"
+    shift || true
 
     case "$command" in
         install)
@@ -469,6 +784,9 @@ main() {
             ;;
         init)
             cmd_init
+            ;;
+        skills)
+            cmd_skills "$@"
             ;;
         sync)
             cmd_sync
