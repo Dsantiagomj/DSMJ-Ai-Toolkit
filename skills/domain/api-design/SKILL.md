@@ -10,7 +10,14 @@ metadata:
   version: "1.0"
   last_updated: "2026-01-17"
   category: domain
+  progressive_disclosure: true
 references:
+  - name: REST Patterns
+    url: ./references/rest-patterns.md
+    type: local
+  - name: GraphQL Design
+    url: ./references/graphql.md
+    type: local
   - name: GraphQL Documentation
     url: https://graphql.org/learn/
     type: documentation
@@ -25,193 +32,183 @@ references:
 
 ---
 
-## What This Skill Covers
+## When to Use This Skill
 
-This skill provides guidance on:
-- **REST API** design principles and patterns
-- **GraphQL** schema design and best practices
-- **HTTP methods** and status codes
-- **API versioning** strategies
-- **Pagination** patterns
-- **Error handling** and validation
-- **Authentication** and authorization patterns
+Use this skill when:
+- Designing new API endpoints (REST or GraphQL)
+- Creating HTTP routes and handlers
+- Implementing pagination, filtering, or sorting
+- Versioning APIs for backward compatibility
+- Handling API errors and validation
+- Designing GraphQL schemas and resolvers
+- Optimizing API performance (N+1 queries, caching)
 
----
-
-## REST API Design
-
-### HTTP Methods
-
-Use HTTP methods correctly:
-
-```
-GET     - Retrieve resource(s)         (Safe, Idempotent)
-POST    - Create new resource          (Not safe, Not idempotent)
-PUT     - Replace entire resource      (Not safe, Idempotent)
-PATCH   - Partially update resource    (Not safe, Not idempotent)
-DELETE  - Remove resource              (Not safe, Idempotent)
-```
-
-**Examples**:
-```typescript
-// Get all users
-GET /api/users
-
-// Get specific user
-GET /api/users/123
-
-// Create new user
-POST /api/users
-Body: { "name": "Alice", "email": "alice@example.com" }
-
-// Replace user (full update)
-PUT /api/users/123
-Body: { "name": "Alice", "email": "alice@example.com", "role": "admin" }
-
-// Partial update
-PATCH /api/users/123
-Body: { "role": "admin" }
-
-// Delete user
-DELETE /api/users/123
-```
+Don't use this skill for:
+- Frontend-only work with no API involvement
+- Direct database queries without an API layer
+- Internal function calls (not exposed as API)
 
 ---
 
-### HTTP Status Codes
+## Critical Patterns
 
-Return appropriate status codes:
+### Pattern 1: HTTP Methods and Status Codes
 
-**2xx Success**:
-```
-200 OK                - Successful GET, PUT, PATCH, DELETE
-201 Created           - Successful POST (resource created)
-204 No Content        - Successful DELETE (no response body)
-```
+**When**: Building RESTful endpoints
 
-**4xx Client Errors**:
-```
-400 Bad Request       - Invalid request data
-401 Unauthorized      - Authentication required
-403 Forbidden         - Authenticated but not authorized
-404 Not Found         - Resource doesn't exist
-409 Conflict          - Resource conflict (e.g., duplicate email)
-422 Unprocessable     - Validation errors
-429 Too Many Requests - Rate limit exceeded
-```
-
-**5xx Server Errors**:
-```
-500 Internal Server   - Unexpected server error
-502 Bad Gateway       - Invalid upstream response
-503 Service Unavail   - Server temporarily unavailable
-```
-
-**Example** (Next.js API Route):
+**Good**:
 ```typescript
-// app/api/users/route.ts
-import { NextResponse } from 'next/server';
-
-export async function GET() {
-  try {
-    const users = await db.user.findMany();
-    return NextResponse.json(users, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch users' },
-      { status: 500 }
-    );
-  }
+// Correct HTTP methods and status codes
+export async function GET(request: Request) {
+  const users = await db.user.findMany();
+  return NextResponse.json(users, { status: 200 });
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
+  const body = await request.json();
 
-    // Validation
-    if (!body.email || !body.name) {
-      return NextResponse.json(
-        { error: 'Email and name are required' },
-        { status: 400 }
-      );
-    }
-
-    // Check for duplicate
-    const existing = await db.user.findUnique({ where: { email: body.email } });
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Email already exists' },
-        { status: 409 }
-      );
-    }
-
-    const user = await db.user.create({ data: body });
-    return NextResponse.json(user, { status: 201 });
-  } catch (error) {
+  if (!body.email || !body.name) {
     return NextResponse.json(
-      { error: 'Failed to create user' },
-      { status: 500 }
+      { error: 'Email and name are required' },
+      { status: 400 }  // Bad Request
     );
   }
+
+  const user = await db.user.create({ data: body });
+  return NextResponse.json(user, { status: 201 });  // Created
+}
+
+export async function DELETE(request: Request) {
+  await db.user.delete({ where: { id: '123' } });
+  return new Response(null, { status: 204 });  // No Content
 }
 ```
 
----
-
-### Resource Naming
-
-**Use nouns, not verbs**:
-```
-✅ GET /api/users          (not /api/getUsers)
-✅ POST /api/users         (not /api/createUser)
-✅ GET /api/users/123      (not /api/getUserById/123)
-```
-
-**Use plural nouns**:
-```
-✅ GET /api/users          (not /api/user)
-✅ GET /api/products       (not /api/product)
-```
-
-**Nested resources**:
-```
-GET /api/users/123/posts           - Get all posts by user 123
-GET /api/users/123/posts/456       - Get post 456 by user 123
-POST /api/users/123/posts          - Create post for user 123
-```
-
-**⚠️ Avoid deep nesting** (max 2 levels):
-```
-❌ GET /api/users/123/posts/456/comments/789/likes
-✅ GET /api/comments/789/likes
-```
-
----
-
-### Pagination
-
-**Cursor-based pagination** (recommended for large datasets):
+**Bad**:
 ```typescript
-// Request
-GET /api/users?cursor=abc123&limit=20
+// ❌ Wrong: Using POST for everything
+export async function POST(request: Request) {
+  const { action, userId } = await request.json();
 
-// Response
-{
-  "data": [...],
-  "pagination": {
-    "nextCursor": "xyz789",
-    "hasMore": true
+  if (action === 'get') {
+    const user = await db.user.findUnique({ where: { id: userId } });
+    return NextResponse.json(user);  // Should be GET
+  }
+
+  if (action === 'delete') {
+    await db.user.delete({ where: { id: userId } });
+    return NextResponse.json({ success: true });  // Should be DELETE
   }
 }
 
-// Implementation (Next.js)
+// ❌ Wrong: Always returning 200
+export async function GET(request: Request) {
+  const user = await db.user.findUnique({ where: { id: '999' } });
+  if (!user) {
+    return NextResponse.json({ error: 'Not found' }, { status: 200 });  // Should be 404
+  }
+  return NextResponse.json(user);
+}
+```
+
+**Why**: Correct HTTP methods and status codes make APIs predictable and RESTful. Clients can rely on standard semantics.
+
+**HTTP Methods Quick Reference**:
+```
+GET     - Retrieve (Safe, Idempotent, Cacheable)
+POST    - Create (Not safe, Not idempotent)
+PUT     - Replace entire resource (Not safe, Idempotent)
+PATCH   - Partial update (Not safe, Usually idempotent)
+DELETE  - Remove (Not safe, Idempotent)
+```
+
+**Status Codes Quick Reference**:
+```
+2xx Success:
+  200 OK            - Successful GET, PUT, PATCH, DELETE
+  201 Created       - Successful POST (resource created)
+  204 No Content    - Successful DELETE (no response body)
+
+4xx Client Errors:
+  400 Bad Request   - Invalid request data
+  401 Unauthorized  - Authentication required
+  403 Forbidden     - Authenticated but not authorized
+  404 Not Found     - Resource doesn't exist
+  409 Conflict      - Resource conflict (duplicate)
+  422 Unprocessable - Validation errors
+
+5xx Server Errors:
+  500 Internal      - Unexpected server error
+  503 Unavailable   - Server temporarily unavailable
+```
+
+---
+
+### Pattern 2: Resource Naming and Nesting
+
+**When**: Designing API URL structure
+
+**Good**:
+```typescript
+// ✅ Use nouns, not verbs
+GET /api/users
+POST /api/users
+GET /api/users/123
+DELETE /api/users/123
+
+// ✅ Plural nouns for collections
+GET /api/products
+GET /api/orders
+
+// ✅ Nested resources (max 2 levels)
+GET /api/users/123/posts
+POST /api/users/123/posts
+GET /api/users/123/posts/456
+```
+
+**Bad**:
+```typescript
+// ❌ Wrong: Verbs in URLs
+GET /api/getUsers
+POST /api/createUser
+DELETE /api/deleteUser/123
+
+// ❌ Wrong: Singular for collections
+GET /api/user
+GET /api/product
+
+// ❌ Wrong: Too deeply nested (3+ levels)
+GET /api/users/123/posts/456/comments/789/likes
+```
+
+**Why**: Nouns represent resources, verbs are implied by HTTP methods. Avoid deep nesting to keep URLs simple and predictable.
+
+**Nested Resources Pattern**:
+```
+GET /api/users/123/posts           - Get all posts by user 123
+GET /api/users/123/posts/456       - Get specific post by user 123
+POST /api/users/123/posts          - Create post for user 123
+
+// ⚠️ For deep relationships, use query params instead:
+GET /api/comments?postId=456
+GET /api/likes?commentId=789
+```
+
+---
+
+### Pattern 3: Pagination
+
+**When**: Returning large collections
+
+**Good - Cursor-based** (recommended for large datasets):
+```typescript
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const cursor = searchParams.get('cursor');
   const limit = parseInt(searchParams.get('limit') || '20');
 
   const users = await db.user.findMany({
-    take: limit + 1, // Fetch one extra to check if more exist
+    take: limit + 1,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     orderBy: { id: 'asc' },
   });
@@ -229,23 +226,8 @@ export async function GET(request: Request) {
 }
 ```
 
-**Offset-based pagination** (simpler, less efficient):
+**Good - Offset-based** (simpler, for admin panels):
 ```typescript
-// Request
-GET /api/users?page=2&limit=20
-
-// Response
-{
-  "data": [...],
-  "pagination": {
-    "page": 2,
-    "limit": 20,
-    "total": 150,
-    "totalPages": 8
-  }
-}
-
-// Implementation
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page') || '1');
@@ -271,113 +253,70 @@ export async function GET(request: Request) {
 }
 ```
 
----
-
-### Filtering and Sorting
-
+**Bad**:
 ```typescript
-// Filtering
-GET /api/users?role=admin&status=active
-
-// Sorting
-GET /api/users?sort=name&order=asc
-
-// Combined
-GET /api/users?role=admin&sort=createdAt&order=desc&limit=20
-
-// Implementation
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const role = searchParams.get('role');
-  const status = searchParams.get('status');
-  const sort = searchParams.get('sort') || 'createdAt';
-  const order = searchParams.get('order') || 'desc';
-
-  const users = await db.user.findMany({
-    where: {
-      ...(role && { role }),
-      ...(status && { status }),
-    },
-    orderBy: { [sort]: order },
-  });
-
+// ❌ No pagination - returns all records
+export async function GET() {
+  const users = await db.user.findMany();  // Could be millions!
   return NextResponse.json(users);
 }
 ```
 
+**Why**: Pagination prevents performance issues and timeouts. Cursor-based is more efficient for large datasets, offset-based is simpler for small datasets.
+
 ---
 
-### API Versioning
+### Pattern 4: API Versioning
 
-**Option 1: URL versioning** (recommended, most explicit):
+**When**: Making breaking changes to existing APIs
+
+**Good - URL versioning** (most explicit):
 ```
 GET /api/v1/users
 GET /api/v2/users
 ```
 
-**Option 2: Header versioning**:
-```
-GET /api/users
-Header: Accept-Version: v2
-```
-
-**Breaking vs Non-Breaking Changes**:
-```
-✅ Non-breaking (no version bump needed):
-- Add new endpoint
-- Add optional field to request
-- Add new field to response
-
-❌ Breaking (requires new version):
-- Remove endpoint
-- Remove field from response
-- Rename field
-- Change field type
-- Make optional field required
-```
-
-**Example** (Next.js):
 ```typescript
 // app/api/v1/users/route.ts
 export async function GET() {
   const users = await db.user.findMany();
-  return NextResponse.json(users); // Old format
+  return NextResponse.json(users);  // Old format
 }
 
 // app/api/v2/users/route.ts
 export async function GET() {
   const users = await db.user.findMany({
-    include: { profile: true }, // New: Include related data
+    include: { profile: true },  // New: Include related data
   });
   return NextResponse.json(users);
 }
 ```
 
+**Breaking vs Non-Breaking Changes**:
+```typescript
+// ✅ Non-breaking (no version bump needed):
+// - Add new endpoint
+// - Add optional field to request
+// - Add new field to response
+
+// ❌ Breaking (requires new version):
+// - Remove endpoint
+// - Remove field from response
+// - Rename field
+// - Change field type
+// - Make optional field required
+```
+
+**Why**: Versioning allows backward compatibility while evolving the API. Existing clients continue working while new clients use improved versions.
+
 ---
 
-### Error Handling
+### Pattern 5: Consistent Error Handling
 
-**Consistent error format**:
+**When**: Handling errors and validation
+
+**Good**:
 ```typescript
-// Error response structure
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid input data",
-    "details": [
-      {
-        "field": "email",
-        "message": "Invalid email format"
-      },
-      {
-        "field": "age",
-        "message": "Must be at least 18"
-      }
-    ]
-  }
-}
-
-// Implementation
 interface ApiError {
   code: string;
   message: string;
@@ -404,7 +343,7 @@ export async function POST(request: Request) {
     const user = await db.user.create({ data: body });
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
-    if (error.code === 'P2002') { // Prisma unique constraint
+    if (error.code === 'P2002') {
       return errorResponse(409, {
         code: 'DUPLICATE_EMAIL',
         message: 'Email already exists',
@@ -419,13 +358,37 @@ export async function POST(request: Request) {
 }
 ```
 
+**Bad**:
+```typescript
+// ❌ Inconsistent error formats
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    if (!body.email) {
+      return NextResponse.json('Email required');  // Plain string
+    }
+
+    const user = await db.user.create({ data: body });
+    return NextResponse.json(user);
+  } catch (error) {
+    return NextResponse.json({
+      message: error.message,  // Inconsistent format
+      stack: error.stack,      // Leaks implementation details
+    });
+  }
+}
+```
+
+**Why**: Consistent error format makes client error handling predictable. Never expose stack traces or internal details in production.
+
 ---
 
-## GraphQL API Design
+## GraphQL Critical Patterns
 
-### Schema Design
+### Pattern 1: Schema Design with Types and Relationships
 
-**Define types clearly**:
+**Good**:
 ```graphql
 type User {
   id: ID!
@@ -448,21 +411,16 @@ type Post {
   content: String!
   author: User!
   published: Boolean!
-  createdAt: DateTime!
 }
 
 type Query {
   user(id: ID!): User
   users(limit: Int, cursor: String): UserConnection!
-  post(id: ID!): Post
-  posts(authorId: ID, published: Boolean): [Post!]!
 }
 
 type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(id: ID!, input: UpdateUserInput!): User!
-  deleteUser(id: ID!): Boolean!
-  createPost(input: CreatePostInput!): Post!
 }
 
 input CreateUserInput {
@@ -470,96 +428,19 @@ input CreateUserInput {
   email: String!
   role: UserRole
 }
-
-input UpdateUserInput {
-  name: String
-  email: String
-  role: UserRole
-}
-
-input CreatePostInput {
-  title: String!
-  content: String!
-  authorId: ID!
-  published: Boolean
-}
 ```
+
+**Why**: Clear types, non-null fields (`!`), and input types make the API self-documenting and type-safe.
 
 ---
 
-### Resolvers
+### Pattern 2: Solving N+1 Queries with DataLoader
 
-**Implement resolvers efficiently**:
+**Problem**:
 ```typescript
-// graphql/resolvers.ts
-import { GraphQLError } from 'graphql';
-
-export const resolvers = {
-  Query: {
-    user: async (_parent, { id }, context) => {
-      const user = await context.db.user.findUnique({ where: { id } });
-      if (!user) {
-        throw new GraphQLError('User not found', {
-          extensions: { code: 'NOT_FOUND' },
-        });
-      }
-      return user;
-    },
-
-    users: async (_parent, { limit = 20, cursor }, context) => {
-      const users = await context.db.user.findMany({
-        take: limit + 1,
-        ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-      });
-
-      const hasMore = users.length > limit;
-      const edges = (hasMore ? users.slice(0, -1) : users).map(user => ({
-        node: user,
-        cursor: user.id,
-      }));
-
-      return {
-        edges,
-        pageInfo: {
-          hasNextPage: hasMore,
-          endCursor: edges[edges.length - 1]?.cursor,
-        },
-      };
-    },
-  },
-
-  Mutation: {
-    createUser: async (_parent, { input }, context) => {
-      // Check authentication
-      if (!context.user) {
-        throw new GraphQLError('Unauthorized', {
-          extensions: { code: 'UNAUTHORIZED' },
-        });
-      }
-
-      // Check permissions
-      if (context.user.role !== 'ADMIN') {
-        throw new GraphQLError('Forbidden', {
-          extensions: { code: 'FORBIDDEN' },
-        });
-      }
-
-      try {
-        const user = await context.db.user.create({ data: input });
-        return user;
-      } catch (error) {
-        if (error.code === 'P2002') {
-          throw new GraphQLError('Email already exists', {
-            extensions: { code: 'DUPLICATE_EMAIL' },
-          });
-        }
-        throw error;
-      }
-    },
-  },
-
+// ❌ N+1 queries: 1 for users + N for posts
+const resolvers = {
   User: {
-    // Field resolver for posts
     posts: async (parent, _args, context) => {
       return context.db.post.findMany({
         where: { authorId: parent.id },
@@ -567,30 +448,12 @@ export const resolvers = {
     },
   },
 };
+// Querying 100 users = 101 database queries!
 ```
 
----
-
-### N+1 Query Problem
-
-**Problem**: Fetching related data in loops causes N+1 queries.
-
+**Solution**:
 ```typescript
-// ❌ Bad: N+1 queries
-type Query {
-  users: [User!]!
-}
-
-type User {
-  posts: [Post!]!
-}
-
-// If you fetch 100 users, this makes:
-// 1 query for users + 100 queries for posts = 101 queries!
-```
-
-**Solution: Use DataLoader**:
-```typescript
+// ✅ DataLoader batches queries
 import DataLoader from 'dataloader';
 
 const postLoader = new DataLoader(async (userIds: readonly string[]) => {
@@ -605,217 +468,174 @@ const postLoader = new DataLoader(async (userIds: readonly string[]) => {
   return postsByUserId;
 });
 
-export const resolvers = {
+const resolvers = {
   User: {
     posts: (parent, _args, context) => {
       return context.loaders.post.load(parent.id);
     },
   },
 };
+// Querying 100 users = 2 queries (users + batched posts)!
+```
 
-// Now: 1 query for users + 1 batched query for all posts = 2 queries!
+**Why**: DataLoader batches and caches database queries, solving the N+1 problem and dramatically improving performance.
+
+---
+
+## Anti-Patterns
+
+### ❌ Anti-Pattern 1: Exposing Database Structure Directly
+
+**Don't do this**:
+```typescript
+// ❌ API mirrors database exactly
+GET /api/users
+Response: {
+  id: 123,
+  password_hash: "bcrypt...",  // Exposing sensitive data!
+  created_at: "2024-01-15",
+  internal_notes: "VIP customer"
+}
+```
+
+**Do this instead**:
+```typescript
+// ✅ API has its own contract
+GET /api/users/123
+Response: {
+  id: 123,
+  name: "Alice",
+  email: "alice@example.com",
+  role: "admin",
+  joinedAt: "2024-01-15T10:00:00Z"
+}
+
+// Server-side: Transform before sending
+export async function GET(request: Request, { params }) {
+  const user = await db.user.findUnique({ where: { id: params.id } });
+
+  return NextResponse.json({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    joinedAt: user.createdAt,
+  });
+}
 ```
 
 ---
 
-### Input Validation
+### ❌ Anti-Pattern 2: No Input Validation
 
-```graphql
-input CreateUserInput {
-  name: String!
-  email: String!
-  age: Int!
+**Don't do this**:
+```typescript
+// ❌ Trusting all input
+export async function POST(request: Request) {
+  const body = await request.json();
+  const user = await db.user.create({ data: body });
+  return NextResponse.json(user);
 }
 ```
 
+**Do this instead**:
 ```typescript
+// ✅ Validate all input
 import { z } from 'zod';
 
-const createUserSchema = z.object({
+const userSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.string().email(),
   age: z.number().int().min(18).max(120),
 });
 
-export const resolvers = {
-  Mutation: {
-    createUser: async (_parent, { input }, context) => {
-      // Validate input
-      const result = createUserSchema.safeParse(input);
-      if (!result.success) {
-        throw new GraphQLError('Validation failed', {
-          extensions: {
-            code: 'VALIDATION_ERROR',
-            errors: result.error.format(),
-          },
-        });
-      }
+export async function POST(request: Request) {
+  const body = await request.json();
 
-      const user = await context.db.user.create({ data: result.data });
-      return user;
-    },
-  },
-};
-```
-
----
-
-### Error Handling in GraphQL
-
-```typescript
-import { GraphQLError } from 'graphql';
-
-// Custom error codes
-export const ErrorCodes = {
-  UNAUTHENTICATED: 'UNAUTHENTICATED',
-  FORBIDDEN: 'FORBIDDEN',
-  NOT_FOUND: 'NOT_FOUND',
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  INTERNAL_ERROR: 'INTERNAL_ERROR',
-} as const;
-
-// Helper function
-function throwGraphQLError(message: string, code: string, data?: any) {
-  throw new GraphQLError(message, {
-    extensions: {
-      code,
-      ...(data && { data }),
-    },
-  });
-}
-
-export const resolvers = {
-  Query: {
-    user: async (_parent, { id }, context) => {
-      const user = await context.db.user.findUnique({ where: { id } });
-      if (!user) {
-        throwGraphQLError('User not found', ErrorCodes.NOT_FOUND);
-      }
-      return user;
-    },
-  },
-};
-
-// Client receives:
-// {
-//   "errors": [{
-//     "message": "User not found",
-//     "extensions": {
-//       "code": "NOT_FOUND"
-//     }
-//   }]
-// }
-```
-
----
-
-## Authentication Patterns
-
-### REST - JWT Bearer Token
-
-```typescript
-// Middleware
-export function authMiddleware(request: Request) {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
+  const result = userSchema.safeParse(body);
+  if (!result.success) {
     return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
+      { error: result.error.format() },
+      { status: 400 }
     );
   }
 
-  const token = authHeader.substring(7);
-  try {
-    const user = verifyJWT(token);
-    return { user };
-  } catch {
-    return NextResponse.json(
-      { error: 'Invalid token' },
-      { status: 401 }
-    );
-  }
+  const user = await db.user.create({ data: result.data });
+  return NextResponse.json(user, { status: 201 });
 }
-
-// Usage
-export async function GET(request: Request) {
-  const auth = authMiddleware(request);
-  if (auth instanceof NextResponse) return auth; // Error response
-
-  const users = await db.user.findMany();
-  return NextResponse.json(users);
-}
-```
-
-### GraphQL - Context-based Auth
-
-```typescript
-// server.ts
-import { createYoga } from 'graphql-yoga';
-
-const yoga = createYoga({
-  schema,
-  context: async ({ request }) => {
-    const authHeader = request.headers.get('Authorization');
-    let user = null;
-
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      try {
-        user = await verifyJWT(token);
-      } catch {
-        // Invalid token, user remains null
-      }
-    }
-
-    return {
-      db,
-      user,
-      loaders: createLoaders(),
-    };
-  },
-});
-
-// Resolvers check context.user
-export const resolvers = {
-  Query: {
-    me: (_parent, _args, context) => {
-      if (!context.user) {
-        throw new GraphQLError('Unauthorized', {
-          extensions: { code: 'UNAUTHORIZED' },
-        });
-      }
-      return context.user;
-    },
-  },
-};
 ```
 
 ---
 
-## Best Practices Summary
+### ❌ Anti-Pattern 3: Ignoring Authentication
 
-### REST
-- ✅ Use appropriate HTTP methods and status codes
-- ✅ Use nouns for resources, not verbs
-- ✅ Version your API (URL versioning recommended)
-- ✅ Implement pagination for list endpoints
-- ✅ Return consistent error formats
-- ✅ Use cursor-based pagination for large datasets
-- ✅ Nest resources max 2 levels deep
+**Don't do this**:
+```typescript
+// ❌ No auth checks
+export async function DELETE(request: Request) {
+  const { id } = await request.json();
+  await db.user.delete({ where: { id } });
+  return NextResponse.json({ success: true });
+}
+```
 
-### GraphQL
-- ✅ Design clear, descriptive schemas
-- ✅ Use DataLoader to prevent N+1 queries
-- ✅ Validate inputs with schema or validation library
-- ✅ Return appropriate error codes in extensions
-- ✅ Implement authentication via context
-- ✅ Use connection pattern for pagination
-- ✅ Keep mutations simple and focused
+**Do this instead**:
+```typescript
+// ✅ Check authentication and authorization
+export async function DELETE(request: Request) {
+  const session = await getSession(request);
+
+  if (!session) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  if (session.role !== 'ADMIN') {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  const { id } = await request.json();
+  await db.user.delete({ where: { id } });
+  return new Response(null, { status: 204 });
+}
+```
+
+---
+
+## Quick Reference
+
+### REST Checklist
+- [ ] Use appropriate HTTP methods (GET, POST, PUT, PATCH, DELETE)
+- [ ] Return correct status codes (2xx, 4xx, 5xx)
+- [ ] Use nouns for resources, not verbs
+- [ ] Implement pagination for collections
+- [ ] Version API for breaking changes
+- [ ] Validate all input
+- [ ] Return consistent error format
+- [ ] Add authentication/authorization checks
+
+### GraphQL Checklist
+- [ ] Design clear schema with types and relationships
+- [ ] Use DataLoader to prevent N+1 queries
+- [ ] Validate inputs with Zod or similar
+- [ ] Return meaningful error codes in extensions
+- [ ] Implement authentication via context
+- [ ] Use connection pattern for pagination
+- [ ] Keep mutations simple and focused
+
+---
+
+## Progressive Disclosure
+
+For detailed implementations, see:
+- **[REST Patterns](./references/rest-patterns.md)** - Pagination, filtering, versioning, rate limiting, HATEOAS
+- **[GraphQL Design](./references/graphql.md)** - Resolvers, DataLoader, subscriptions, directives, input validation
 
 ---
 
 ## References
 
+- [REST Patterns Reference](./references/rest-patterns.md)
+- [GraphQL Design Reference](./references/graphql.md)
 - [GraphQL Documentation](https://graphql.org/learn/)
 - [REST API Tutorial](https://restfulapi.net/)
 
