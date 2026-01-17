@@ -25,10 +25,13 @@ curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/in
 source ~/.zshrc  # or ~/.bashrc
 ```
 
-**Option 2: Homebrew** (Coming Soon)
+**Option 2: Homebrew**
 ```bash
-# Via Homebrew tap
-brew tap dsantiagomj/dsmj-ai
+# Direct install from tap
+brew install dsantiagomj/dsmj-ai-toolkit/dsmj-ai-toolkit
+
+# Or tap first, then install
+brew tap dsantiagomj/dsmj-ai-toolkit
 brew install dsmj-ai-toolkit
 ```
 
@@ -482,12 +485,12 @@ cp skills/TEMPLATE.md skills/domain/my-skill/SKILL.md
 - Context7 MCP integration examples
 - Agent usage analytics and insights
 
-### 🚀 Phase 3: Distribution & Publishing (In Progress)
+### 🚀 Phase 3: Distribution & Publishing (Complete)
 - ✅ curl installation script
 - ✅ Uninstall script
 - ✅ GitHub releases workflow
-- ✅ Homebrew formula
-- 🔲 Homebrew tap repository
+- ✅ Homebrew formula (same-repo tap)
+- ✅ Published on Homebrew
 - 🔲 NPM package (for Node.js projects)
 - 🔲 Team conventions sync
 - 🔲 Shared skill libraries across teams
