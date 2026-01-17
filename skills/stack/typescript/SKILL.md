@@ -43,6 +43,512 @@ references:
 
 ---
 
+## When to Use This Skill
+
+**Use this skill when**:
+- Writing any JavaScript code that would benefit from type safety
+- Building Node.js backend applications
+- Developing React, Vue, or other frontend frameworks
+- Creating libraries or shared code packages
+- Working with APIs and need to define request/response types
+- Refactoring existing JavaScript to add type safety
+
+**Don't use this skill when**:
+- Writing simple scripts where type safety adds no value (config files, build scripts)
+- Working with languages other than JavaScript/TypeScript (use their respective skills)
+- Types become more complex than the value they provide (prefer simplicity)
+
+---
+
+## Critical Patterns
+
+### Pattern 1: Type Inference vs Explicit Types
+
+**When**: Writing functions and variables
+
+**Good**:
+```typescript
+// ✅ Let TypeScript infer simple types
+const name = 'John' // inferred as string
+const age = 30 // inferred as number
+const items = [1, 2, 3] // inferred as number[]
+
+// ✅ Explicit types for function signatures (better docs)
+function processUser(id: string, options?: { admin: boolean }): User {
+  return { id, name: 'John', isAdmin: options?.admin ?? false }
+}
+
+// ✅ Infer return type for simple functions
+const double = (n: number) => n * 2 // return type inferred as number
+
+// ✅ Explicit return type for complex functions
+async function fetchUser(id: string): Promise<User | null> {
+  const response = await fetch(`/api/users/${id}`)
+  if (!response.ok) return null
+  return response.json()
+}
+```
+
+**Bad**:
+```typescript
+// ❌ Over-annotating obvious types
+const name: string = 'John' // unnecessary
+const age: number = 30 // unnecessary
+const items: number[] = [1, 2, 3] // unnecessary
+
+// ❌ Missing function parameter types
+function processUser(id, options) { // any, any - loses type safety
+  return { id, name: 'John' }
+}
+
+// ❌ Missing return types on exported functions
+export function fetchUser(id: string) { // return type unclear
+  return fetch(`/api/users/${id}`).then(r => r.json())
+}
+```
+
+**Why**: Let TypeScript infer simple types to reduce noise. Add explicit types for function signatures to improve documentation and catch errors. Always type function parameters and return types for exported functions.
+
+---
+
+### Pattern 2: Discriminated Unions for Type Safety
+
+**When**: Handling multiple possible states or types
+
+**Good**:
+```typescript
+// ✅ Discriminated union with type field
+type Result<T> =
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string }
+  | { status: 'loading' }
+
+function handleResult<T>(result: Result<T>) {
+  // TypeScript knows which fields exist based on status
+  if (result.status === 'success') {
+    console.log(result.data) // ✅ TypeScript knows data exists
+  } else if (result.status === 'error') {
+    console.log(result.error) // ✅ TypeScript knows error exists
+  } else {
+    console.log('Loading...') // ✅ TypeScript knows no extra fields
+  }
+}
+
+// ✅ Discriminated union for different shapes
+type Shape =
+  | { kind: 'circle'; radius: number }
+  | { kind: 'rectangle'; width: number; height: number }
+  | { kind: 'square'; size: number }
+
+function calculateArea(shape: Shape): number {
+  switch (shape.kind) {
+    case 'circle':
+      return Math.PI * shape.radius ** 2 // ✅ radius available
+    case 'rectangle':
+      return shape.width * shape.height // ✅ width, height available
+    case 'square':
+      return shape.size ** 2 // ✅ size available
+  }
+}
+```
+
+**Bad**:
+```typescript
+// ❌ Union without discriminator
+type Result<T> = {
+  data?: T
+  error?: string
+  loading?: boolean
+}
+
+function handleResult<T>(result: Result<T>) {
+  if (result.data) {
+    console.log(result.data) // ❌ Could still have error or loading
+  }
+  // ❌ Hard to know which state we're in
+}
+
+// ❌ Using strings without type safety
+function calculateArea(shape: any) {
+  if (shape.type === 'cirlce') { // ❌ Typo not caught
+    return Math.PI * shape.r ** 2 // ❌ Wrong property name
+  }
+}
+```
+
+**Why**: Discriminated unions provide exhaustive type checking and make illegal states unrepresentable. TypeScript can narrow types based on the discriminator field.
+
+---
+
+### Pattern 3: Generic Constraints for Reusable Code
+
+**When**: Writing reusable functions that work with multiple types
+
+**Good**:
+```typescript
+// ✅ Generic with constraints
+interface HasId {
+  id: string
+}
+
+function findById<T extends HasId>(items: T[], id: string): T | undefined {
+  return items.find(item => item.id === id) // ✅ TypeScript knows T has id
+}
+
+// ✅ Multiple type parameters with constraints
+function merge<T extends object, U extends object>(obj1: T, obj2: U): T & U {
+  return { ...obj1, ...obj2 }
+}
+
+const result = merge({ name: 'John' }, { age: 30 }) // { name: string, age: number }
+
+// ✅ Conditional types for advanced patterns
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : T
+
+type A = UnwrapPromise<Promise<string>> // string
+type B = UnwrapPromise<number> // number
+
+// ✅ keyof constraint
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key] // ✅ Type-safe property access
+}
+
+const user = { name: 'John', age: 30 }
+const name = getProperty(user, 'name') // string
+const age = getProperty(user, 'age') // number
+// getProperty(user, 'invalid') // ❌ Error: invalid not in keyof user
+```
+
+**Bad**:
+```typescript
+// ❌ Generic without constraints
+function findById<T>(items: T[], id: string): T | undefined {
+  return items.find(item => item.id === id) // ❌ Error: Property 'id' does not exist on type 'T'
+}
+
+// ❌ Using any loses type safety
+function merge(obj1: any, obj2: any): any {
+  return { ...obj1, ...obj2 } // ❌ Lost all type information
+}
+
+// ❌ String property access
+function getProperty(obj: any, key: string): any {
+  return obj[key] // ❌ No type safety
+}
+```
+
+**Why**: Generic constraints ensure type safety while maintaining flexibility. They catch errors at compile time and provide better IntelliSense.
+
+---
+
+### Pattern 4: Utility Types for Type Transformations
+
+**When**: Deriving new types from existing ones
+
+**Good**:
+```typescript
+interface User {
+  id: string
+  name: string
+  email: string
+  password: string
+  role: 'admin' | 'user'
+  createdAt: Date
+}
+
+// ✅ Pick for selecting specific properties
+type UserPreview = Pick<User, 'id' | 'name'>
+// { id: string, name: string }
+
+// ✅ Omit for excluding sensitive data
+type PublicUser = Omit<User, 'password'>
+// { id, name, email, role, createdAt }
+
+// ✅ Partial for optional updates
+type UserUpdate = Partial<User>
+// All properties optional
+
+function updateUser(id: string, updates: Partial<User>) {
+  // ✅ Can update any subset of user fields
+}
+
+// ✅ Required for making all properties required
+type RequiredUser = Required<Partial<User>>
+// All properties required
+
+// ✅ Readonly for immutable data
+type ImmutableUser = Readonly<User>
+const user: ImmutableUser = { /* ... */ }
+// user.name = 'Jane' // ❌ Error: readonly property
+
+// ✅ Record for maps/dictionaries
+type UserMap = Record<string, User>
+const users: UserMap = {
+  'user1': { id: '1', name: 'John', /* ... */ },
+  'user2': { id: '2', name: 'Jane', /* ... */ }
+}
+
+// ✅ ReturnType to extract function return type
+function getUser() {
+  return { id: '1', name: 'John', email: 'john@example.com' }
+}
+
+type UserType = ReturnType<typeof getUser>
+// { id: string, name: string, email: string }
+```
+
+**Bad**:
+```typescript
+// ❌ Manually duplicating types
+type UserPreview = {
+  id: string // ❌ Duplicated from User
+  name: string // ❌ Duplicated from User
+}
+
+// ❌ Allowing all properties in updates
+function updateUser(id: string, updates: User) {
+  // ❌ Forces providing all fields, including password
+}
+
+// ❌ No type for dictionaries
+const users: any = {} // ❌ Lost type safety
+users.user1 = { wrong: 'shape' } // ❌ No error
+```
+
+**Why**: Utility types keep types DRY (Don't Repeat Yourself), automatically sync with source types, and provide common type transformations.
+
+---
+
+## Anti-Patterns
+
+### ❌ Anti-Pattern 1: Overusing `any`
+
+**Don't do this**:
+```typescript
+// ❌ Using any defeats the purpose of TypeScript
+function processData(data: any): any {
+  return data.map((item: any) => item.value) // No type safety
+}
+
+const result: any = await fetch('/api/users').then(r => r.json())
+// ❌ Lost all type information
+
+// ❌ any in interfaces
+interface ApiResponse {
+  data: any // ❌ Could be anything
+  error: any // ❌ Could be anything
+}
+```
+
+**Why it's bad**: Disables TypeScript's type checking, loses IntelliSense, allows runtime errors, makes refactoring dangerous.
+
+**Do this instead**:
+```typescript
+// ✅ Use specific types or generics
+function processData<T extends { value: any }>(data: T[]): any[] {
+  return data.map(item => item.value)
+}
+
+// ✅ Define API response types
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+const result: User[] = await fetch('/api/users').then(r => r.json())
+
+// ✅ Generic interfaces
+interface ApiResponse<T> {
+  data: T
+  error: string | null
+}
+
+// ✅ Or use unknown for truly unknown data
+function processUnknown(data: unknown) {
+  if (typeof data === 'string') {
+    return data.toUpperCase() // ✅ Type narrowed to string
+  }
+  throw new Error('Invalid data')
+}
+```
+
+---
+
+### ❌ Anti-Pattern 2: Type Assertions Instead of Type Guards
+
+**Don't do this**:
+```typescript
+// ❌ Unsafe type assertion
+function processUser(data: any) {
+  const user = data as User // ❌ No runtime check
+  console.log(user.name.toUpperCase()) // ❌ Runtime error if not a User
+}
+
+// ❌ Double assertion
+const value = ('hello' as any) as number // ❌ Completely unsafe
+
+// ❌ Non-null assertion without checking
+function getUser(id?: string) {
+  const userId = id! // ❌ Asserts non-null without checking
+  return fetchUser(userId) // ❌ Runtime error if id is undefined
+}
+```
+
+**Why it's bad**: Type assertions bypass type checking, can cause runtime errors, make code less safe than vanilla JavaScript.
+
+**Do this instead**:
+```typescript
+// ✅ Type guards for runtime validation
+function isUser(data: unknown): data is User {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'id' in data &&
+    'name' in data &&
+    'email' in data
+  )
+}
+
+function processUser(data: unknown) {
+  if (isUser(data)) {
+    console.log(data.name.toUpperCase()) // ✅ Type-safe
+  }
+}
+
+// ✅ Validation libraries (Zod)
+import { z } from 'zod'
+
+const UserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email()
+})
+
+type User = z.infer<typeof UserSchema>
+
+function processUser(data: unknown) {
+  const user = UserSchema.parse(data) // ✅ Runtime validation
+  console.log(user.name.toUpperCase()) // ✅ Type-safe
+}
+
+// ✅ Check before using
+function getUser(id?: string) {
+  if (!id) {
+    throw new Error('ID required')
+  }
+  return fetchUser(id) // ✅ Type narrowed to string
+}
+```
+
+---
+
+### ❌ Anti-Pattern 3: Ignoring Strict Mode
+
+**Don't do this**:
+```typescript
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": false, // ❌ Disables all strict checks
+    "strictNullChecks": false // ❌ Allows null/undefined anywhere
+  }
+}
+
+// This allows dangerous code
+function getLength(str: string): number {
+  return str.length // ❌ Runtime error if str is null
+}
+
+getLength(null) // ❌ No TypeScript error, runtime crash
+```
+
+**Why it's bad**: Disables TypeScript's most valuable features, allows null/undefined bugs, makes migration harder, reduces code quality.
+
+**Do this instead**:
+```typescript
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true, // ✅ Enable all strict checks
+    "noUncheckedIndexedAccess": true, // ✅ Extra safety for arrays
+    "noImplicitOverride": true // ✅ Explicit override keyword
+  }
+}
+
+// Write safer code
+function getLength(str: string | null): number {
+  if (!str) return 0 // ✅ Handle null explicitly
+  return str.length
+}
+
+// ✅ Or use optional chaining
+function getLength(str?: string): number {
+  return str?.length ?? 0
+}
+```
+
+---
+
+### ❌ Anti-Pattern 4: Excessive Type Complexity
+
+**Don't do this**:
+```typescript
+// ❌ Overly complex mapped types
+type DeepPartial<T> = T extends object
+  ? { [P in keyof T]?: DeepPartial<T[P]> }
+  : T
+
+type DeepReadonly<T> = T extends object
+  ? { readonly [P in keyof T]: DeepReadonly<T[P]> }
+  : T
+
+type DeepRequired<T> = T extends object
+  ? { [P in keyof T]-?: DeepRequired<T[P]> }
+  : T
+
+// ❌ Using complex types that are hard to understand
+type ComplexType<T> = DeepPartial<DeepReadonly<DeepRequired<T>>>
+
+// ❌ Overly nested conditional types
+type Unwrap<T> = T extends Promise<infer U>
+  ? U extends Promise<infer V>
+    ? V extends Promise<infer W>
+      ? W
+      : V
+    : U
+  : T
+```
+
+**Why it's bad**: Hard to understand, difficult to debug, slow compilation, confusing error messages, maintenance nightmare.
+
+**Do this instead**:
+```typescript
+// ✅ Keep types simple and focused
+type UserUpdate = Partial<Pick<User, 'name' | 'email'>>
+
+// ✅ Break complex types into smaller pieces
+type BaseUser = Pick<User, 'id' | 'name' | 'email'>
+type UserWithRole = BaseUser & { role: string }
+type AdminUser = UserWithRole & { permissions: string[] }
+
+// ✅ Use utility types appropriately
+type PartialUser = Partial<User> // Simple and clear
+
+// ✅ Add type aliases for clarity
+type UserId = string
+type UserEmail = string
+type UserRole = 'admin' | 'user' | 'guest'
+
+interface User {
+  id: UserId
+  email: UserEmail
+  role: UserRole
+}
+```
+
+---
+
 ## What This Skill Covers
 
 - **Type annotations** and type inference
