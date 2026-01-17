@@ -311,50 +311,17 @@ Recommendations:
 
 ## Special Cases
 
-### Case 1: Mobile/Responsive Testing
+### Mobile, Cross-Browser, Performance Testing
 
-**When**: Feature works on desktop, need mobile verification
+For detailed procedures on:
+- Mobile/responsive testing
+- Cross-browser compatibility
+- Performance testing from user perspective
+- Security-focused QA
+- Regression testing
+- Edge case testing
 
-**Check**:
-- Touch targets large enough (44x44px minimum)
-- Gestures work (swipe, pinch-to-zoom if appropriate)
-- Viewport sizes (phone, tablet)
-- Landscape and portrait orientations
-- Native features (camera access, geolocation)
-
-**Using Bash**:
-```bash
-# Simulate mobile viewport (if using Playwright/Cypress)
-npm run test:e2e -- --device="iPhone 13"
-npm run test:e2e -- --device="iPad"
-```
-
-### Case 2: Cross-Browser Testing
-
-**When**: Feature uses newer APIs or CSS
-
-**Test browsers**:
-- Chrome/Edge (Chromium)
-- Firefox
-- Safari (WebKit)
-- Mobile browsers (Safari iOS, Chrome Android)
-
-**Check for**:
-- Feature support (CSS Grid, ES6 features)
-- Polyfills loaded if needed
-- Graceful degradation
-- Consistent appearance
-
-### Case 3: Performance Testing (User Perception)
-
-**When**: Feature involves data loading or heavy operations
-
-**Check**:
-- Time to interactive (<3 seconds ideal)
-- First Contentful Paint (<1.5 seconds)
-- Loading indicators present
-- Progressive enhancement (show something fast)
-- Optimistic UI updates where appropriate
+See [references/qa-special-cases.md](./references/qa-special-cases.md)
 
 ---
 
@@ -439,130 +406,16 @@ Recommendation: Fix High issues before release.
 
 ---
 
-## Example: Complete QA Cycle
+## Complete Examples
 
-**User Request**: "QA the new checkout flow before release"
+For detailed examples of complete QA cycles including:
+- Complete checkout flow QA
+- Form testing examples
+- Accessibility testing reports
+- i18n testing reports
+- UAT scenarios
 
-**Your Response**:
-
-```
-Phase 1: Understanding Requirements
-
-Reviewing user stories:
-- Story 1: Express checkout for returning users
-- Story 2: Guest checkout option
-- Story 3: Multiple payment methods
-
-Acceptance criteria:
-✅ Checkout completable in <60 seconds
-✅ Works on mobile
-✅ Accessible (WCAG AA)
-✅ Supports 3 languages
-
-Phase 2: Functional QA
-
-Testing express checkout:
-✅ Saved addresses auto-fill
-✅ One-click payment works
-✅ Order confirmation immediate
-⚠️ Issue: Can't edit address after auto-fill
-
-Testing guest checkout:
-✅ No account required
-✅ Email for order tracking
-⚠️ Issue: Guest can't see order history later
-
-Testing payment methods:
-✅ Credit card works
-✅ PayPal integration works
-❌ Critical: Stripe error on submit (500 error)
-
-Phase 3: Accessibility Check
-
-Keyboard navigation:
-✅ All form fields tabbable
-✅ Enter submits form
-✅ Escape closes modals
-⚠️ Issue: Focus lost after payment modal closes
-
-Screen reader (NVDA):
-✅ Form labels announced
-✅ Error messages announced
-⚠️ Issue: "Total: $99.99" not announced on update
-
-Visual:
-✅ Contrast 4.8:1 (WCAG AA)
-✅ Text resizable
-❌ Issue: Focus indicator missing on payment button
-
-Phase 4: i18n Check
-
-Tested: English, Spanish, German
-
-Text extraction:
-✅ All strings in translation files
-
-Layout (German):
-✅ Form handles longer labels
-⚠️ Issue: "Proceed to Payment" button truncates
-
-Number formatting:
-✅ Prices: $99.99 (en) vs 99,99 € (de)
-✅ Dates formatted correctly
-
-Phase 5: UAT
-
-User flow (returning customer):
-1. Login → ✅ Fast
-2. Add to cart → ✅ Works
-3. Checkout → ✅ Address pre-filled
-4. Select shipping → ✅ Options clear
-5. Payment → ❌ Stripe error
-6. Could not complete
-
-Usability observations:
-✅ Flow is intuitive
-✅ Clear progress indicator
-⚠️ "Save this address" checkbox easy to miss
-⚠️ No indication of which payment methods accepted
-
-Summary Report:
-
-QA Status: ❌ NOT READY FOR RELEASE
-
-Critical Issues (Must Fix):
-1. Stripe payment failing (500 error) - checkout.tsx:145
-2. Focus indicator missing on payment button (WCAG fail)
-
-High Issues (Should Fix):
-3. Can't edit auto-filled address
-4. Focus lost after payment modal
-5. "Proceed to Payment" truncates in German
-
-Medium Issues (Nice to Have):
-6. Total not announced on update (screen reader)
-7. Guest checkout no order history
-8. "Save address" checkbox not prominent
-
-Low Issues:
-9. Payment method icons missing
-
-Recommendations:
-1. Fix Stripe integration error (blocks checkout)
-2. Add focus indicator (accessibility requirement)
-3. Fix High issues for better UX
-4. Consider Medium/Low for next release
-
-Test Evidence:
-- Screenshots: /qa-reports/checkout-20260115/
-- Screen recording: checkout-flow.mp4
-- Accessibility report: axe-results.json
-
-Next Steps:
-1. Spawn code-writer to fix Critical issues
-2. Re-test after fixes
-3. Get user approval for Medium/Low priority
-```
+See [references/qa-detailed-examples.md](./references/qa-detailed-examples.md)
 
 ---
 

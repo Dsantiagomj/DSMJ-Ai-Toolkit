@@ -464,99 +464,16 @@ Next steps:
 
 ---
 
-## Example: Complete Git Workflow
+## Complete Examples
 
-**User Request**: "Commit the authentication changes and create a PR"
+For detailed examples of complete git workflows including:
+- Complete commit and PR workflow
+- Multiple commits for large changes
+- Breaking changes handling
+- Release workflows
+- PR description templates
 
-**Your Response**:
-
-```
-Phase 1: Assess Changes
-
-→ Running git status...
-→ Running git diff...
-→ Reading recent commits for style...
-
-Found changes:
-- app/api/auth/refresh/route.ts (new file)
-- lib/auth/refresh.ts (new file)
-- __tests__/auth/refresh.test.ts (new file)
-- docs/api/auth.md (modified)
-
-Nature: New feature (JWT token refresh)
-No sensitive files detected ✅
-
-Phase 2: Draft Commit Message
-
-Following Conventional Commits:
-- Type: feat (new feature)
-- Scope: auth
-- Subject: add JWT token refresh endpoint
-
-Message:
-feat(auth): add JWT token refresh endpoint
-
-Users were being logged out after token expiry with no way to
-refresh without re-authenticating. This adds /auth/refresh
-endpoint that issues new tokens using refresh token cookie.
-
-Closes #123
-
-Phase 3: Create Commit
-
-→ Staging files...
-→ Creating commit...
-→ Verifying...
-
-✅ Commit created: a1b2c3d
-   feat(auth): add JWT token refresh endpoint
-
-Phase 4: Update Documentation
-
-→ Updated docs/api/auth.md (added refresh endpoint)
-→ Updated CHANGELOG.md (Unreleased section)
-→ Creating docs commit...
-
-✅ Docs commit created: e4f5g6h
-   docs(auth): document token refresh endpoint
-
-Phase 5: Create Pull Request
-
-→ Checking branch status...
-→ Current branch: feature/auth-refresh
-→ Base branch: main
-→ Pushing to remote...
-
-✅ Pushed to origin/feature/auth-refresh
-
-→ Creating PR with gh...
-
-PR Description:
-## Summary
-- Added JWT token refresh endpoint
-- Prevents session expiry logouts
-- Automatic token renewal
-
-## Changes
-- Added: POST /api/auth/refresh endpoint
-- Added: Token refresh logic with rotation
-- Added: Tests for refresh flow
-- Updated: API documentation
-
-## Testing
-- [x] Unit tests (5/5 passing)
-- [x] Integration tests (3/3 passing)
-- [x] Manual: Token refresh verified
-
-## Checklist
-- [x] Tests passing
-- [x] Documentation updated
-- [x] No breaking changes
-
-✅ PR created: https://github.com/user/repo/pull/124
-
-Complete! Changes committed and PR ready for review.
-```
+See [references/git-docs-examples.md](./references/git-docs-examples.md)
 
 ---
 
