@@ -1,6 +1,6 @@
 # Skills Catalog - Community Skills Reference
 
-**149+ skills for Claude Code agents** (7 local + 142 community)
+**161+ skills for Claude Code agents** (19 local + 142 community)
 
 This catalog includes local stack-specific skills and organizes community skills from the [awesome-claude-skills](https://github.com/VoltAgent/awesome-claude-skills) ecosystem.
 
@@ -72,6 +72,65 @@ These skills are maintained locally and pre-installed in your toolkit. They focu
   - For: code-writer, planner, devops
 
 All local skills include Context7 references for up-to-date documentation.
+
+### Domain Skills
+
+**Security & Quality**:
+- **security** - Security best practices and OWASP guidelines
+  - Input validation, authentication, authorization patterns
+  - SQL injection, XSS, CSRF prevention
+  - For: code-writer, code-reviewer, planner
+
+- **testing-frameworks** - Testing patterns and best practices
+  - Unit, integration, e2e testing strategies
+  - Mocking, fixtures, test organization
+  - For: code-writer, qa
+
+- **performance** - Performance optimization patterns
+  - N+1 query prevention, caching strategies
+  - Bundle optimization, lazy loading
+  - For: code-writer, code-reviewer, planner
+
+**Architecture & Design**:
+- **api-design** - RESTful and GraphQL API design
+  - Endpoint structure, versioning, pagination
+  - Error handling, status codes
+  - For: code-writer, planner
+
+- **patterns** - Design patterns and architectural principles
+  - SOLID, DRY, YAGNI principles
+  - Common design patterns (Factory, Strategy, Observer)
+  - For: code-writer, planner
+
+- **database-migrations** - Database schema evolution
+  - Migration strategies, rollback patterns
+  - Zero-downtime migrations
+  - For: code-writer, planner, devops
+
+**User Experience**:
+- **accessibility** - WCAG compliance and a11y patterns
+  - ARIA labels, keyboard navigation, screen readers
+  - Color contrast, focus management
+  - For: code-writer, qa
+
+- **i18n** - Internationalization and localization
+  - Translation management, RTL support
+  - Locale handling, number/date formatting
+  - For: code-writer, planner
+
+### Meta Skills
+
+**Toolkit Workflows**:
+- **skill-creator** - Interactive skill creation guide
+  - Step-by-step skill development workflow
+  - Validation checklists, frontmatter templates
+  - Decision frameworks for skill eligibility
+  - For: All agents when creating new skills
+
+- **context-monitor** - Context usage monitoring
+  - Track context window usage
+  - Optimize skill and agent loading
+  - For: All agents
 
 ---
 
