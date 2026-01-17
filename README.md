@@ -1,16 +1,14 @@
 # dsmj-ai-toolkit
 
-A production-quality, reusable AI toolkit for Claude Code that adapts to different projects and tech stacks.
+A production-quality AI toolkit for Claude Code with specialized agents, modular skills, and intelligent stack detection. Built for professional development workflows with security and quality gates integrated.
 
 ## Features
 
-- 🎯 **Specialist-First Architecture**: Always uses focused specialists (code-writer, code-reviewer) for better context and quality
-- 🧩 **Modular Skills**: Composable knowledge modules following the [Agent Skills](https://agentskills.io) open standard
-- 🔄 **Auto-Stack Detection**: Automatically detects your tech stack and configures appropriate skills
-- 🔗 **Symlink-Based Updates**: Global toolkit with per-project symlinks for easy updates
-- 📋 **Quality Gates**: Vibe Coding principles integrated (Frame → Scope → Generate → Review → Verify)
-- 🎨 **Maestro Mode**: Optional casual communication style (Spanish + English slangs)
-- 🛡️ **Security-First**: Built-in security best practices (OWASP Top 10, auth patterns)
+- **🎯 Specialist Agents**: 6 focused agents (code-writer, code-reviewer, planner, qa, git-docs, devops)
+- **🧩 18 Modular Skills**: Stack-specific knowledge (React, TypeScript, Docker, Prisma, etc.) + domain expertise (security, accessibility, performance)
+- **🔄 Auto-Stack Detection**: Automatically configures skills based on your project
+- **🔗 Symlink Architecture**: Global installation, per-project configuration
+- **🛡️ Security First**: OWASP patterns and quality gates built-in
 
 ## Quick Start
 
@@ -18,520 +16,208 @@ A production-quality, reusable AI toolkit for Claude Code that adapts to differe
 
 **Option 1: Quick Install (Recommended)**
 ```bash
-# One-command installation via curl
 curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/install.sh | bash
-
-# Restart your terminal or reload shell
 source ~/.zshrc  # or ~/.bashrc
 ```
 
 **Option 2: Homebrew**
 ```bash
-# Direct install from tap
 brew install dsantiagomj/dsmj-ai-toolkit/dsmj-ai-toolkit
-
-# Or tap first, then install
-brew tap dsantiagomj/dsmj-ai-toolkit
-brew install dsmj-ai-toolkit
 ```
 
-**Option 3: Manual Installation**
+**Option 3: Manual**
 ```bash
-# Clone the repository
 git clone https://github.com/dsantiagomj/dsmj-ai-toolkit.git
 cd dsmj-ai-toolkit
-
-# Install globally
 ./bin/dsmj-ai install
-
-# Add to PATH (or restart terminal)
-source ~/.zshrc  # or ~/.bashrc
 ```
 
-**Uninstall**
+### Initialize Your Project
+
 ```bash
-# Remove toolkit completely
+cd your-project
+dsmj-ai init  # Auto-detects stack, links agents & skills
+claude-code   # Start Claude Code
+```
+
+### Uninstall
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/uninstall.sh | bash
-
-# Or if already installed
-bash ~/.dsmj-ai-toolkit/uninstall.sh
 ```
 
-### Initialize a Project
+## What You Get
 
-```bash
-# Navigate to your project
-cd my-project
+### 6 Specialized Agents
 
-# Initialize toolkit
-dsmj-ai init
+| Agent | Purpose | Use When |
+|-------|---------|----------|
+| **code-writer** | Implementation | Writing features, fixing bugs |
+| **code-reviewer** | Quality + Security | Reviewing code, running tests |
+| **planner** | Architecture | Planning features, gathering requirements |
+| **qa** | Testing | UAT, accessibility, functional testing |
+| **git-docs** | Git + Docs | Commits, PRs, documentation |
+| **devops** | Operations | CI/CD, deployment, monitoring |
 
-# This will:
-# - Detect your stack (React, Next.js, Python, etc.)
-# - Create .claude/ directory (if it doesn't exist)
-# - Symlink relevant agents and skills
-# - Generate customizable CLAUDE.md config (if it doesn't exist)
-```
+### 18 Skills
 
-**⚠️ Safe with Existing MCP Configurations**:
-The toolkit is **additive** and preserves existing configurations:
-- ✅ Preserves existing `.claude/settings.json`, `.claude/mcp.json`, etc.
-- ✅ Only adds `agents/` and `skills/` subdirectories
-- ✅ Skips `CLAUDE.md` generation if file already exists
-- ✅ Won't overwrite any existing MCP server configurations
+**Stack** (9): React, TypeScript, Docker, Prisma, tRPC, Radix UI, React Hook Form, Zustand, Vercel AI SDK
 
-If you have MCP servers already configured, they will continue working!
+**Domain** (8): Security, Accessibility, API Design, Database Migrations, i18n, Design Patterns, Performance, Testing Frameworks
 
-See [docs/MCP_SAFETY.md](docs/MCP_SAFETY.md) for detailed safety information.
+**Meta** (1): Context Monitor
 
-### Start Using
+[See full skills list →](skills/CATALOG.md)
 
-```bash
-# Start Claude Code in your project
-claude-code
-
-# The toolkit is now active!
-# - Main Claude acts as orchestrator
-# - Spawns specialists for focused work
-# - Uses skills for domain knowledge
-```
-
-## Architecture
-
-### The Vibe Loop
-
-Our workflow follows this pattern:
+### How It Works
 
 ```
-Frame outcome → Scope change → Generate → Review diff → Verify
-```
+┌─────────────────────────────────────────────────────┐
+│  Your Project                                       │
+├─────────────────────────────────────────────────────┤
+│  .claude/                                           │
+│  ├── CLAUDE.md          ← Your customization       │
+│  ├── agents/            ← Symlinks to global       │
+│  └── skills/            ← Auto-selected by stack   │
+└─────────────────────────────────────────────────────┘
+                    ↓ (symlinks)
+┌─────────────────────────────────────────────────────┐
+│  Global: ~/.dsmj-ai-toolkit/                        │
+├─────────────────────────────────────────────────────┤
+│  ├── agents/            ← 6 specialist agents      │
+│  ├── skills/            ← 18 knowledge modules     │
+│  ├── templates/         ← CLAUDE.md template       │
+│  └── bin/dsmj-ai        ← CLI tool                 │
+└─────────────────────────────────────────────────────┘
 
-**In practice**:
-1. **Main Claude (Orchestrator)**: Analyzes request, references skills
-2. **Spawn Specialist**: code-writer for implementation, code-reviewer for reviews
-3. **Focused Work**: Specialist works in isolated context with relevant skills
-4. **Review & Verify**: Quality gates ensure code quality
-5. **Return Summary**: Clear file references and next steps
-
-### Agents (6 Total)
-
-**Core Agents** (Always Available):
-- **code-writer**: Implementation specialist - writes code only
-- **code-reviewer**: Quality specialist - code review, security checks, runs automated tests
-- **git-docs**: Git workflow specialist - commits, PRs, documentation, changelog
-
-**Recommended Agents** (Most Projects):
-- **planner**: Planning specialist - requirements gathering, architecture decisions, task breakdown
-- **qa**: Quality assurance specialist - functional QA, UAT, accessibility, i18n, manual testing
-
-**Optional Agents** (Specialized Needs):
-- **devops**: Operations specialist - CI/CD, monitoring, publishing, releases, SRE
-
-**Agent Usage by Project Type**:
-| Project Type | Agents Needed | Count |
-|--------------|---------------|-------|
-| Backend API | code-writer, code-reviewer, git-docs, planner | 4 |
-| Web App | + qa | 5 |
-| With CI/CD | + devops | 6 |
-
-### Skills
-
-**Stack Skills** (auto-loaded based on detection):
-- `react`: React 19 patterns with Server Components
-- `nextjs`: Next.js 15 App Router patterns
-- `python`: Python 3.12 best practices
-- `typescript`: TypeScript patterns and types
-
-**Domain Skills** (always loaded):
-- `security`: OWASP Top 10, auth patterns, secure coding
-
-**Meta Skills**:
-- `context-monitor`: Detects conversation drift, suggests refocusing
-
-## CLAUDE.md Configuration
-
-The `.claude/CLAUDE.md` file is your **primary customization point**:
-
-### Project Context (Prompt DNA)
-```markdown
-## Project Context
-**Stack**: Next.js 15, React 19, TypeScript, Prisma
-**Current State**: Building authentication system
-**Architecture**: API routes in /app/api/, components in /components/
-
-## Goals & Auto-Invoke Rules
-- **React components** → Reference react skill
-- **API routes** → Reference nextjs skill
-- **Security concerns** → Reference security skill
-
-## Non-Goals (Anti-Patterns)
-- ❌ Don't use client components unless necessary
-- ❌ Don't bypass auth middleware
-```
-
-### Communication Styles
-
-**Default**: Professional, concise, technical
-
-**Maestro Mode**: Casual, friendly, with slangs
-```
-Activate with: "/maestro" or "use maestro mode"
-
-Spanish slangs: ojo, chévere, dale, bacano, listo
-English slangs: bet, lowkey, ngl, fr, valid
-```
-
-**IMPORTANT**: Maestro only changes communication style. ALL core rules and quality gates still apply.
-
-### Core Operating Rules
-
-1. **Git Commits**: Never add AI attribution
-2. **Build Process**: Never auto-build, let user decide
-3. **Tooling**: Use bat/rg/fd/sd/eza (modern tools)
-4. **User Questions**: STOP and WAIT, never assume
-5. **Verification First**: "Déjame verificar" before confirming
-6. **Being Wrong**: Explain with evidence or acknowledge
-7. **Show Alternatives**: Present options with tradeoffs
-8. **Technical Accuracy**: Verify before stating claims
-9. **Quality Gates**: Review → Test → Verify before commit
-
-## Directory Structure
-
-### Global Installation
-```
-~/.dsmj-ai-toolkit/
-├── templates/
-│   └── CLAUDE.md.template
-├── agents/
-│   ├── code-writer.md         # Core: Implementation
-│   ├── code-reviewer.md       # Core: Quality + tests
-│   ├── git-docs.md            # Core: Git + documentation
-│   ├── planner.md             # Recommended: Planning
-│   ├── qa.md                  # Recommended: QA + UAT
-│   └── devops.md              # Optional: Operations
-├── skills/
-│   ├── stack/
-│   │   ├── react/
-│   │   ├── nextjs/
-│   │   └── python/
-│   ├── domain/
-│   │   └── security/
-│   └── meta/
-│       └── context-monitor/
-└── bin/
-    └── dsmj-ai
-```
-
-### Project Structure (after init)
-```
-my-project/
-├── .claude/
-│   ├── CLAUDE.md                 # User customizes THIS
-│   ├── agents/                   # Symlinks to global (based on project needs)
-│   │   ├── code-writer.md -> ~/.dsmj-ai-toolkit/agents/code-writer.md
-│   │   ├── code-reviewer.md -> ~/.dsmj-ai-toolkit/agents/code-reviewer.md
-│   │   ├── git-docs.md -> ~/.dsmj-ai-toolkit/agents/git-docs.md
-│   │   ├── planner.md -> ~/.dsmj-ai-toolkit/agents/planner.md
-│   │   ├── qa.md -> ~/.dsmj-ai-toolkit/agents/qa.md
-│   │   └── devops.md -> ~/.dsmj-ai-toolkit/agents/devops.md
-│   └── skills/                   # Symlinks to global
-│       ├── react -> ~/.dsmj-ai-toolkit/skills/stack/react
-│       ├── security -> ~/.dsmj-ai-toolkit/skills/domain/security
-│       └── context-monitor -> ~/.dsmj-ai-toolkit/skills/meta/context-monitor
-└── [your project files]
+Update toolkit once → All projects benefit immediately
 ```
 
 ## CLI Commands
 
 ```bash
-# Install globally
-dsmj-ai install
-
-# Initialize current project
-dsmj-ai init
-
-# Show status
-dsmj-ai status
-
-# Update toolkit (WIP)
-dsmj-ai update
-
-# Resync skills (WIP)
-dsmj-ai sync
-
-# Show version
-dsmj-ai version
-
-# Show help
-dsmj-ai help
+dsmj-ai install      # Install globally
+dsmj-ai init         # Initialize current project
+dsmj-ai status       # Show installation status
+dsmj-ai version      # Show version
+dsmj-ai help         # Show help
 ```
-
-## Quality Gates Workflow
-
-Before ANY commit:
-
-1. **Diff Review**: code-reviewer analyzes changes
-2. **Run It**: Execute relevant tests (when applicable)
-3. **Edge Checks**: Verify error handling, edge cases
-4. **Stop If**:
-   - Tests failing
-   - Security vulnerabilities detected
-   - User hasn't confirmed breaking changes
-   - Build errors present
-
-## Example Workflows
-
-### Complete Feature Implementation
-```
-User: "Add user profile editing with accessibility support"
-
-Main Claude (Orchestrator):
-  1. Analyzes request
-  2. Spawns planner for requirements and planning
-
-planner:
-  1. Gathers requirements (acceptance criteria, edge cases)
-  2. Explores codebase for existing patterns
-  3. Creates implementation plan with task breakdown
-  4. Returns structured plan
-
-Main Claude:
-  1. Reviews plan with user, gets approval
-  2. Spawns code-writer for implementation
-
-code-writer:
-  1. References react + security skills
-  2. Implements profile editing components and API
-  3. Returns summary with file references
-
-Main Claude:
-  1. Spawns code-reviewer for quality check
-
-code-reviewer:
-  1. Reviews code quality and security
-  2. Runs automated tests (unit, integration)
-  3. Returns review (security, patterns, test coverage)
-
-Main Claude:
-  1. Spawns qa for user acceptance testing
-
-qa:
-  1. Tests user flows (edit profile, save, validation)
-  2. Checks accessibility (WCAG, keyboard nav, screen readers)
-  3. Tests edge cases (empty states, long text, errors)
-  4. Returns QA report with issues found
-
-Main Claude:
-  1. If issues found, spawns code-writer to fix
-  2. When approved, spawns git-docs
-
-git-docs:
-  1. Creates conventional commit
-  2. Updates API documentation
-  3. Updates CHANGELOG.md
-  4. Creates PR (if requested)
-
-Result: Complete, tested, documented feature ready for merge
-```
-
-### Quick Fix Workflow
-```
-User: "Fix the password validation bug"
-
-Main Claude:
-  1. Spawns code-writer for quick fix
-
-code-writer:
-  1. Fixes validation logic
-  2. Returns summary
-
-Main Claude:
-  1. Spawns code-reviewer
-
-code-reviewer:
-  1. Reviews fix, runs tests
-  2. Confirms no regressions
-
-Main Claude:
-  1. Spawns git-docs for commit
-
-Result: Bug fixed, tested, committed
-```
-
-## Progressive Disclosure
-
-Skills use progressive disclosure to minimize context:
-
-```
-skills/stack/react/
-├── SKILL.md              # Main content (~500 lines)
-└── references/           # Detailed docs (loaded as needed)
-    ├── server-components.md
-    ├── hooks-reference.md
-    ├── performance.md
-    └── testing.md
-```
-
-Main content is loaded automatically. References are loaded only when needed.
 
 ## Customization
 
-### What to Customize
-✅ `.claude/CLAUDE.md` (Project Context, Goals, Non-Goals, Conventions)
+Edit `.claude/CLAUDE.md` to customize for your project:
 
-### What NOT to Change
-❌ Agent files (toolkit maintains these, updates via symlinks)
-❌ Skill files (toolkit maintains these, updates via symlinks)
+- **Project Context**: Stack, architecture, current state
+- **Auto-Invoke Rules**: When to reference which skills
+- **Non-Goals**: Anti-patterns to avoid
+- **Communication Style**: Professional or Maestro mode (casual)
+
+[→ Full Configuration Guide](docs/CONFIGURATION.md)
 
 ### Creating Custom Agents
 
-Want to create your own agents? We've got you covered!
-
-**Quick Start**:
 ```bash
-# Copy the template
 cp agents/TEMPLATE.md agents/my-agent.md
-
 # Edit and customize
-# See agents/GUIDE.md for complete instructions
 ```
 
-**Resources**:
-- **[agents/TEMPLATE.md](agents/TEMPLATE.md)** - Blank template to copy
-- **[agents/GUIDE.md](agents/GUIDE.md)** - Complete creation guide with best practices
-- **[agents/examples/](agents/examples/)** - Working examples of different agent patterns:
-  - `minimal-agent.md` - Simple specialist (formatter)
-  - `read-only-reviewer.md` - Security auditor (read-only)
-  - `code-implementer.md` - Full-stack builder (all tools)
-  - `research-specialist.md` - Tech researcher (web access)
-
-**See [agents/GUIDE.md](agents/GUIDE.md) for**:
-- YAML frontmatter rules and best practices
-- Tool permission patterns
-- Workflow structure guidelines
-- Quality standards
-- Common pitfalls to avoid
-
-### Advanced: Customize Existing Agents
-
-```bash
-dsmj-ai customize-agent code-writer
-```
-
-This breaks the symlink and creates a local copy you maintain.
-
-⚠️ **Warning**: Custom agents won't receive toolkit updates!
+[→ Agent Creation Guide](agents/GUIDE.md)
 
 ### Creating Custom Skills
 
-Want to create domain knowledge for your project? Skills system has you covered!
-
-**Quick Start**:
 ```bash
-# Copy the template
 cp skills/TEMPLATE.md skills/domain/my-skill/SKILL.md
-
 # Edit and customize
-# See skills/GUIDE.md for complete instructions
 ```
 
-**Resources**:
-- **[skills/TEMPLATE.md](skills/TEMPLATE.md)** - Blank template to copy
-- **[skills/GUIDE.md](skills/GUIDE.md)** - Complete creation guide with best practices
-- **[skills/examples/](skills/examples/)** - Working examples of different skill patterns:
-  - `minimal-skill.md` - Git conventions (simplest)
-  - `stack-skill.md` - Vue 3 Composition API (framework patterns)
-  - `domain-skill.md` - Testing patterns (cross-framework)
-  - `meta-skill.md` - Code review checklist (workflow)
+[→ Skill Creation Guide](skills/GUIDE.md)
 
-**See [skills/GUIDE.md](skills/GUIDE.md) for**:
-- YAML frontmatter rules and validation
-- Progressive disclosure patterns
-- Content structure guidelines
-- Stack vs Domain vs Meta categories
-- Quality standards and best practices
+## Documentation
 
-## Philosophy & Principles
+- **[Configuration Guide](docs/CONFIGURATION.md)** - Customize CLAUDE.md for your project
+- **[Workflow Examples](docs/WORKFLOWS.md)** - Real-world usage patterns
+- **[Architecture](docs/ARCHITECTURE.md)** - How the toolkit works
+- **[MCP Safety](docs/MCP_SAFETY.md)** - Safe with existing MCP configs
+- **[Agent Guide](agents/GUIDE.md)** - Create custom agents
+- **[Skill Guide](skills/GUIDE.md)** - Create custom skills
 
-### Core Beliefs
-1. **Specialists Over Generalists**: Focused context beats knowing everything
-2. **Quality Over Speed**: Verify before acting, review before committing
-3. **Clarity Over Cleverness**: Simple, clear code beats clever abstractions
-4. **Security By Default**: Auth, validation, and error handling are not optional
+## Example Workflow
 
-### Vibe Coding Principles (Integrated)
-- **Director Mindset**: Orchestrator coordinates, specialists implement
-- **Small Scopes**: Each specialist handles focused subtask
-- **Verify by Default**: Check before confirming, test before deploying
-- **State Discipline**: Clean context, clear summaries, no pollution
+```
+User: "Add user authentication with security best practices"
+
+Main Claude:
+  → Spawns planner (gathers requirements, creates plan)
+  → Spawns code-writer (implements feature with security skill)
+  → Spawns code-reviewer (security audit, runs tests)
+  → Spawns qa (tests user flows, accessibility)
+  → Spawns git-docs (commits, updates docs)
+
+Result: Complete, tested, secure feature ready to ship
+```
+
+[→ See more workflow examples](docs/WORKFLOWS.md)
+
+## Philosophy
+
+- **Specialists > Generalists**: Focused context beats knowing everything
+- **Quality > Speed**: Verify before acting, review before committing
+- **Security by Default**: Auth, validation, error handling built-in
+- **Progressive Disclosure**: Load knowledge only when needed
 
 ## Roadmap
 
 ### ✅ Phase 1: Core Architecture (Complete)
-- Main Claude orchestrator pattern
-- 6 specialized agents (core + recommended + optional)
-- 3 core agents: code-writer, code-reviewer, git-docs
-- 2 recommended agents: planner, qa
-- 1 optional agent: devops
-- react + security + context-monitor skills
-- CLAUDE.md with Prompt DNA + Maestro mode
-- Installation CLI with symlinks
-- MCP-safe installation (preserves existing configs)
+- 6 specialized agents
+- 18 skills with progressive disclosure
+- CLI tool with auto-stack detection
+- MCP-safe installation
 
-### 🔲 Phase 2: Expanded Skills & Polish
-- Skills: 20+ stack skills (Vue, Angular, Django, FastAPI, Go, Rust, etc.)
-- Domain skills: testing-frameworks, api-design, accessibility, i18n, performance
-- Agent skill improvements (progressive disclosure)
-- Context7 MCP integration examples
-- Agent usage analytics and insights
+### ✅ Phase 2: Skills & Polish (Complete)
+- Stack skills (React, TypeScript, Docker, etc.)
+- Domain skills (security, accessibility, performance)
+- Comprehensive guides and templates
 
-### 🚀 Phase 3: Distribution & Publishing (Complete)
-- ✅ curl installation script
-- ✅ Uninstall script
-- ✅ GitHub releases workflow
-- ✅ Homebrew formula (same-repo tap)
-- ✅ Published on Homebrew
-- 🔲 NPM package (for Node.js projects)
-- 🔲 Team conventions sync
-- 🔲 Shared skill libraries across teams
-- 🔲 Project templates (backend, fullstack, mobile)
+### ✅ Phase 3: Distribution (Complete)
+- curl installation script
+- Homebrew formula
+- GitHub Actions releases
+- Uninstall script
 
-### 🔲 Phase 4: Advanced Features
-- Custom skill creation wizard
-- Visual agent workflow designer
-- Performance analytics (agent usage, token costs)
-- Integration marketplace
-- AI-powered skill recommendations
+### 🔲 Phase 4: Community & Ecosystem
+- Community skill marketplace
+- VS Code extension
+- Skill recommendations based on codebase
+- Team conventions sync
 
 ## Contributing
 
-Contributions welcome! This is an open-source toolkit.
+Contributions welcome! Please:
 
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## Support
+
+- 📖 [Full Documentation](docs/)
+- 🐛 [Issue Tracker](https://github.com/dsantiagomj/dsmj-ai-toolkit/issues)
+- 💬 [Discussions](https://github.com/dsantiagomj/dsmj-ai-toolkit/discussions)
+- 🔒 [Security Policy](SECURITY.md)
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details
+MIT License - see [LICENSE](LICENSE) file
 
 ## Credits
 
-Built by [dsantiagomj](https://github.com/dsantiagomj)
+Built by [David Santiago M.](https://github.com/dsantiagomj)
 
 Inspired by:
 - [Agent Skills](https://agentskills.io) open standard
 - [Prowler](https://github.com/prowler-cloud/prowler) skills-based architecture
-- [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) agent patterns
 - Vibe Coding principles for AI-directed development
-
-## Support
-
-- 📖 [Documentation](https://github.com/dsantiagomj/dsmj-ai-toolkit/wiki)
-- 🐛 [Issue Tracker](https://github.com/dsantiagomj/dsmj-ai-toolkit/issues)
-- 💬 [Discussions](https://github.com/dsantiagomj/dsmj-ai-toolkit/discussions)
 
 ---
 
