@@ -169,6 +169,81 @@ function App() {
 
 ---
 
+## Code Examples
+
+### Example 1: Code Splitting with Dynamic Imports
+
+```typescript
+import { lazy, Suspense } from 'react';
+
+// Lazy load heavy components
+const ChartComponent = lazy(() => import('./ChartComponent'));
+const AnalyticsDashboard = lazy(() => import('./AnalyticsDashboard'));
+
+export default function Dashboard() {
+  const [showAnalytics, setShowAnalytics] = useState(false);
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+
+      <Suspense fallback={<div>Loading chart...</div>}>
+        <ChartComponent />
+      </Suspense>
+
+      <button onClick={() => setShowAnalytics(true)}>
+        Show Analytics
+      </button>
+
+      {showAnalytics && (
+        <Suspense fallback={<div>Loading analytics...</div>}>
+          <AnalyticsDashboard />
+        </Suspense>
+      )}
+    </div>
+  );
+}
+```
+
+### Example 2: Optimized Image Loading
+
+```tsx
+import Image from 'next/image';
+
+export function HeroSection() {
+  return (
+    <section>
+      {/* LCP image - prioritize loading */}
+      <Image
+        src="/hero-banner.jpg"
+        width={1200}
+        height={600}
+        priority
+        alt="Hero banner"
+      />
+
+      {/* Below-the-fold images - lazy load */}
+      <div className="grid grid-cols-3 gap-4 mt-8">
+        {products.map(product => (
+          <Image
+            key={product.id}
+            src={product.image}
+            width={400}
+            height={300}
+            loading="lazy"
+            alt={product.name}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Quick Checklist
 
 **Images**:

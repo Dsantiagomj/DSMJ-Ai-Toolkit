@@ -601,6 +601,68 @@ export async function DELETE(request: Request) {
 
 ---
 
+## Code Examples
+
+### Example 1: RESTful CRUD Endpoint
+
+```typescript
+// app/api/users/[id]/route.ts
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const user = await db.user.findUnique({ where: { id: params.id } });
+
+  if (!user) {
+    return new Response('User not found', { status: 404 });
+  }
+
+  return NextResponse.json(user);
+}
+
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+  const body = await request.json();
+  const user = await db.user.update({
+    where: { id: params.id },
+    data: body,
+  });
+
+  return NextResponse.json(user);
+}
+```
+
+### Example 2: GraphQL Resolver with DataLoader
+
+```typescript
+const resolvers = {
+  Query: {
+    users: async (_parent, { limit = 20, cursor }, context) => {
+      const users = await context.db.user.findMany({
+        take: limit + 1,
+        ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      });
+
+      const hasMore = users.length > limit;
+      const data = hasMore ? users.slice(0, -1) : users;
+
+      return {
+        edges: data.map(user => ({ node: user, cursor: user.id })),
+        pageInfo: {
+          hasNextPage: hasMore,
+          endCursor: hasMore ? data[data.length - 1].id : null,
+        },
+      };
+    },
+  },
+  User: {
+    posts: (parent, _args, context) => {
+      return context.loaders.posts.load(parent.id);
+    },
+  },
+};
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Quick Reference
 
 ### REST Checklist

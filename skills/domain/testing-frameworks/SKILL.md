@@ -212,6 +212,66 @@ test('user validation', () => {
 
 ---
 
+## Code Examples
+
+### Example 1: Unit Test with Mocking (Jest/Vitest)
+
+```typescript
+import { getUserById, updateUser } from './userService';
+import { db } from './db';
+
+jest.mock('./db');
+
+describe('userService', () => {
+  test('should fetch user by id', async () => {
+    // Arrange
+    const mockUser = { id: 1, name: 'Alice', email: 'alice@example.com' };
+    (db.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+
+    // Act
+    const user = await getUserById(1);
+
+    // Assert
+    expect(db.user.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
+    expect(user).toEqual(mockUser);
+  });
+
+  test('should throw error when user not found', async () => {
+    // Arrange
+    (db.user.findUnique as jest.Mock).mockResolvedValue(null);
+
+    // Act & Assert
+    await expect(getUserById(999)).rejects.toThrow('User not found');
+  });
+});
+```
+
+### Example 2: Component Test with User Interaction
+
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react';
+import { LoginForm } from './LoginForm';
+
+test('should display error on invalid email', async () => {
+  // Arrange
+  render(<LoginForm />);
+
+  // Act
+  const emailInput = screen.getByLabelText(/email/i);
+  const submitButton = screen.getByRole('button', { name: /submit/i });
+
+  fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
+  fireEvent.click(submitButton);
+
+  // Assert
+  expect(await screen.findByText(/invalid email/i)).toBeInTheDocument();
+});
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Quick Reference
 
 ### Jest/Vitest Commands

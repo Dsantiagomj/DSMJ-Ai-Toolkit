@@ -180,6 +180,66 @@ model User {
 
 ---
 
+## Code Examples
+
+### Example 1: Adding a New Model
+
+```prisma
+// schema.prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  posts     Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  published Boolean  @default(false)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
+```
+
+```bash
+# Create migration
+npx prisma migrate dev --name add_post_model
+
+# Applies migration and generates Prisma Client
+```
+
+### Example 2: Safe Data Migration
+
+```typescript
+// Backfill default values before making field required
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+async function backfillUserNames() {
+  // Update all NULL names to empty string
+  await prisma.$executeRaw`
+    UPDATE "User"
+    SET name = COALESCE(name, '')
+    WHERE name IS NULL
+  `;
+
+  console.log('Backfill complete');
+}
+
+backfillUserNames()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Production Checklist
 
 **Before deployment**:

@@ -195,6 +195,61 @@ export default function EventDate({ date, amount }) {
 
 ---
 
+## Code Examples
+
+### Example 1: Basic Translation with Variables
+
+```typescript
+// messages/en.json
+{
+  "welcome": "Welcome, {username}!",
+  "cartItems": "You have {count, plural, =0 {no items} =1 {1 item} other {# items}} in your cart"
+}
+
+// Component
+import { useTranslations } from 'next-intl';
+
+export default function Header({ username, cartCount }: HeaderProps) {
+  const t = useTranslations();
+
+  return (
+    <header>
+      <h1>{t('welcome', { username })}</h1>
+      <p>{t('cartItems', { count: cartCount })}</p>
+    </header>
+  );
+}
+```
+
+### Example 2: Locale-Aware Date and Number Formatting
+
+```typescript
+import { useFormatter } from 'next-intl';
+
+export default function ProductCard({ product }: ProductCardProps) {
+  const format = useFormatter();
+
+  return (
+    <div>
+      <h3>{product.name}</h3>
+      <p>{format.number(product.price, {
+        style: 'currency',
+        currency: 'USD'
+      })}</p>
+      <time>{format.dateTime(product.releaseDate, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })}</time>
+    </div>
+  );
+}
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Progressive Disclosure
 
 For detailed implementations:

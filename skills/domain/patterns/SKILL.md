@@ -378,6 +378,69 @@ function validateUserEmail(user: User) {
 
 ---
 
+## Code Examples
+
+### Example 1: Factory Pattern for Payment Processing
+
+```typescript
+interface PaymentProcessor {
+  process(amount: number): Promise<void>;
+}
+
+class StripeProcessor implements PaymentProcessor {
+  async process(amount: number) {
+    console.log(`Processing $${amount} via Stripe`);
+  }
+}
+
+class PayPalProcessor implements PaymentProcessor {
+  async process(amount: number) {
+    console.log(`Processing $${amount} via PayPal`);
+  }
+}
+
+class PaymentFactory {
+  static create(provider: 'stripe' | 'paypal'): PaymentProcessor {
+    switch (provider) {
+      case 'stripe': return new StripeProcessor();
+      case 'paypal': return new PayPalProcessor();
+    }
+  }
+}
+
+// Usage
+const processor = PaymentFactory.create('stripe');
+await processor.process(99.99);
+```
+
+### Example 2: Dependency Injection for Testability
+
+```typescript
+interface Logger {
+  log(message: string): void;
+}
+
+class UserService {
+  constructor(private logger: Logger) {}
+
+  createUser(name: string) {
+    this.logger.log(`Creating user: ${name}`);
+    // User creation logic
+  }
+}
+
+// Production
+const service = new UserService(new ConsoleLogger());
+
+// Testing
+const mockLogger = { log: jest.fn() };
+const testService = new UserService(mockLogger);
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Quick Reference
 
 ### When to Use Each Pattern

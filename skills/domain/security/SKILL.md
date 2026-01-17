@@ -267,6 +267,70 @@ app.get('/api/user/:id', async (req, res) => {
 
 ---
 
+## Code Examples
+
+### Example 1: Secure Authentication Endpoint
+
+```typescript
+import bcrypt from 'bcryptjs';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(12),
+});
+
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  const result = loginSchema.safeParse(body);
+  if (!result.success) {
+    return new Response('Invalid input', { status: 400 });
+  }
+
+  const user = await db.user.findUnique({
+    where: { email: result.data.email }
+  });
+
+  if (!user || !(await bcrypt.compare(result.data.password, user.password))) {
+    return new Response('Invalid credentials', { status: 401 });
+  }
+
+  const session = await createSession(user.id);
+  return NextResponse.json({ session });
+}
+```
+
+### Example 2: Input Validation with Zod
+
+```typescript
+const userSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  age: z.number().int().min(18).max(120),
+  role: z.enum(['USER', 'ADMIN']),
+});
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  const result = userSchema.safeParse(body);
+
+  if (!result.success) {
+    return NextResponse.json(
+      { error: result.error.format() },
+      { status: 400 }
+    );
+  }
+
+  const user = await db.user.create({ data: result.data });
+  return NextResponse.json(user, { status: 201 });
+}
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Quick Security Checklist
 
 **Before deploying**:

@@ -649,6 +649,61 @@ const Dashboard = () => {
 
 ---
 
+## Code Examples
+
+### Example 1: Button Component with All States
+
+```tsx
+export function Button({ variant = 'primary', isLoading, disabled, children }: ButtonProps) {
+  return (
+    <button
+      disabled={disabled || isLoading}
+      className={cn(
+        'px-4 py-2 rounded-lg font-medium transition-all',
+        variant === 'primary' && 'bg-blue-600 text-white',
+        variant === 'secondary' && 'bg-gray-200 text-gray-900',
+        !disabled && !isLoading && 'hover:opacity-90 active:scale-95',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+        disabled && 'opacity-50 cursor-not-allowed',
+        isLoading && 'cursor-wait'
+      )}
+    >
+      {isLoading && <Spinner className="mr-2 w-4 h-4 animate-spin" />}
+      {children}
+    </button>
+  );
+}
+```
+
+### Example 2: Responsive Card Grid
+
+```tsx
+export function ProductGrid({ products }: ProductGridProps) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {products.map(product => (
+        <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-48 object-cover"
+          />
+          <div className="p-4 space-y-2">
+            <h3 className="text-lg font-semibold">{product.name}</h3>
+            <p className="text-sm text-gray-600">{product.description}</p>
+            <p className="text-xl font-bold text-blue-600">${product.price}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Quick Reference
 
 ### Visual Hierarchy Scale

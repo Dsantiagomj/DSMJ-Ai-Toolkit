@@ -203,6 +203,94 @@ Use this skill when:
 
 ---
 
+## Code Examples
+
+### Example 1: Accessible Form with Validation
+
+```tsx
+export function SignupForm() {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="space-y-1">
+        <label htmlFor="email" className="block text-sm font-medium">
+          Email Address *
+        </label>
+        <input
+          id="email"
+          type="email"
+          aria-required="true"
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? 'email-error' : undefined}
+          className={cn(
+            'border rounded-lg px-3 py-2',
+            errors.email && 'border-red-500'
+          )}
+        />
+        {errors.email && (
+          <p id="email-error" role="alert" className="text-sm text-red-600">
+            {errors.email}
+          </p>
+        )}
+      </div>
+
+      <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+        Sign Up
+      </button>
+    </form>
+  );
+}
+```
+
+### Example 2: Keyboard-Accessible Custom Dropdown
+
+```tsx
+export function Dropdown({ items, onSelect }: DropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        Select Option
+      </button>
+
+      {isOpen && (
+        <ul role="listbox" tabIndex={-1}>
+          {items.map((item, index) => (
+            <li
+              key={item.id}
+              role="option"
+              tabIndex={0}
+              onClick={() => onSelect(item)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') onSelect(item);
+              }}
+            >
+              {item.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+```
+
+For comprehensive examples and detailed implementations, see the [references/](./references/) folder.
+
+---
+
 ## Quick Reference
 
 ### WCAG AA Requirements
