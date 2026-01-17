@@ -1,12 +1,17 @@
 ---
 name: react
-description: Modern React patterns with Server Components, Actions, and hooks. Use when writing React components, JSX files, or working with React-specific features.
+description: >
+  Modern React patterns with Server Components, Actions, and hooks.
+  Trigger: When writing React components, when creating JSX files, when implementing hooks, when using Server Components or Actions.
 tags: [react, frontend, javascript, typescript, ui, components, server-components, hooks]
 author: dsmj-ai-toolkit
 metadata:
   auto_invoke: "Writing React components, JSX files, hooks, or React-specific code"
   stack_category: frontend
   progressive_disclosure: true
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: Server Components
     url: ./references/server-components.md

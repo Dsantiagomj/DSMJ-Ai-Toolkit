@@ -98,7 +98,7 @@ security-auditor:
 - Integration with multiple skills
 - Quality gates throughout
 - Can spawn other agents (Task tool)
-- Both professional and Maestro communication modes
+- Adaptable communication style
 
 **Key features**:
 - Full implementation access
@@ -272,7 +272,7 @@ All agents should have:
 
 ### Optional Sections
 - **Special Cases** - Scenarios needing different approach
-- **Communication Style** - Professional + Maestro
+- **Communication Style** - Adaptable tone and style
 - **When to Stop and Ask** - Clarification triggers
 - **Spawning Other Agents** - When to delegate
 
@@ -349,10 +349,10 @@ claude-code
 - Not just at the end
 - Specific, checkable criteria
 
-### 7. Communication Modes (from code-implementer, research-specialist)
-- Support both professional and Maestro
-- Show examples of each
-- Keep technical accuracy in both modes
+### 7. Communication Style (from code-implementer, research-specialist)
+- Adapt to communication style set in CLAUDE.md
+- Show example output
+- Maintain technical accuracy regardless of style
 
 ---
 

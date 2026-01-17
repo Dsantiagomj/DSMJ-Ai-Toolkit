@@ -1,9 +1,15 @@
 ---
 name: trpc
 domain: backend
-description: Type-safe APIs with tRPC - End-to-end typesafe APIs without code generation. Covers routers, procedures, context, middleware, and React Query integration.
+description: >
+  Type-safe APIs with tRPC - End-to-end typesafe APIs without code generation. Covers routers, procedures, context, middleware, and React Query integration.
+  Trigger: When creating tRPC routers, when implementing procedures, when setting up API endpoints, when using tRPC with React Query.
 version: 1.0.0
 tags: [trpc, api, typescript, type-safety, react-query, next.js]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: tRPC Official Documentation
     url: https://trpc.io/docs

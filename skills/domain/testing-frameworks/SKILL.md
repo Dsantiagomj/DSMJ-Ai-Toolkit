@@ -1,9 +1,15 @@
 ---
 name: testing-frameworks
 domain: testing
-description: Testing patterns for Jest, Vitest, and Pytest. Covers test structure (AAA pattern), mocking strategies, fixtures, assertions, and testing best practices for JavaScript/TypeScript and Python.
+description: >
+  Testing patterns for Jest, Vitest, and Pytest. Covers test structure (AAA pattern), mocking strategies, fixtures, assertions, and testing best practices for JavaScript/TypeScript and Python.
+  Trigger: When writing tests, when setting up test frameworks, when implementing mocks, when creating test fixtures, when following TDD practices.
 version: 1.0.0
 tags: [testing, jest, vitest, pytest, mocking, fixtures, tdd]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 references:
   - name: Jest Documentation
     url: https://jestjs.io/docs/getting-started

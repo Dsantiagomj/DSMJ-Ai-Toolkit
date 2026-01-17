@@ -1,9 +1,15 @@
 ---
 name: zustand
 domain: frontend
-description: Minimalist state management with Zustand - Simple, fast state management for React. Covers store creation, middleware, TypeScript patterns, and async actions.
+description: >
+  Minimalist state management with Zustand - Simple, fast state management for React.
+  Trigger: When implementing global state, when managing client-side state, when creating stores, when using state management in React.
 version: 1.0.0
 tags: [zustand, state-management, react, typescript, hooks]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: Zustand Documentation
     url: https://zustand.pmnd.rs/

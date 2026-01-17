@@ -32,9 +32,21 @@ cp agents/TEMPLATE.md agents/your-agent.md
 ```yaml
 ---
 name: your-agent
-description: When to invoke and what it does
-tools: [Read, Write, Edit]
+description: >
+  Clear description of what this agent does.
+  Trigger: When [condition 1], when [condition 2], when [condition 3].
+tools:
+  - Read
+  - Write
+  - Edit
 model: sonnet
+metadata:
+  author: your-github-username
+  version: "1.0"
+  category: implementation|review|planning|testing|devops|docs
+  last_updated: YYYY-MM-DD
+  spawnable: true
+  permissions: full|read-only|limited
 ---
 ```
 
@@ -90,21 +102,37 @@ claude-code
 - Non-empty
 - No XML tags
 - This is the PRIMARY triggering mechanism
+- **MUST include "Trigger:" clause with 3+ specific conditions**
 
 **Best practices**:
 - Include BOTH what the agent does AND when to use it
 - Be specific: "Reviews code for security vulnerabilities and runs automated tests" not "Reviews code"
-- Include triggers: "Use when analyzing code quality, checking OWASP compliance, or running test suites"
+- **Start with main description, then add "Trigger:" clause**
+- Include 3-5 specific trigger conditions after "Trigger:"
 - Front-load important info (first 100 chars most impactful)
+
+**Format**:
+```yaml
+description: >
+  [What the agent does - clear, concise description].
+  Trigger: When [condition 1], when [condition 2], when [condition 3].
+```
 
 **Examples**:
 ```yaml
-✅ description: Quality assurance specialist. Reviews code quality, runs automated tests (unit, integration, e2e), checks OWASP security vulnerabilities, and validates patterns. Use when code needs quality review, security audit, or test verification.
+✅ description: >
+  Quality assurance specialist. Reviews code quality, runs automated tests, checks security.
+  Trigger: When code needs review, when running tests, when checking OWASP compliance,
+  when validating patterns, when user requests QA.
 
-✅ description: Git workflow and documentation specialist. Handles commits with conventional commit format, creates PRs, updates documentation (README, API docs), and maintains CHANGELOG. Use when code is ready to commit or documentation needs updating.
+✅ description: >
+  Git workflow and documentation specialist. Handles commits, PRs, and docs.
+  Trigger: When code is ready to commit, when creating pull requests,
+  when updating documentation, when user says "commit" or "document".
 
-❌ description: Reviews code (too vague, no triggers)
-❌ description: Does stuff with git (unprofessional, unclear)
+❌ description: Reviews code (too vague, no triggers, missing Trigger: clause)
+❌ description: Does stuff with git (unprofessional, unclear, no Trigger: clause)
+❌ description: Code writer. Trigger: when needed (vague trigger conditions)
 ```
 
 ### Optional Fields
@@ -163,6 +191,41 @@ tools: [Read, Write, Edit, Grep, Glob, Bash, Task]
 ✅ model: haiku     # Simple tasks (formatters, linters)
 ```
 
+#### `metadata` (required)
+**Purpose**: Structured metadata for tracking and validation
+
+**Required fields**:
+- `author`: GitHub username or organization
+- `version`: Semantic version (e.g., "1.0", "2.1")
+- `category`: Agent category (implementation, review, planning, testing, devops, docs)
+- `last_updated`: Date in YYYY-MM-DD format
+- `spawnable`: Boolean indicating if agent can be spawned
+- `permissions`: Permission level (full, read-only, limited)
+
+**Best practices**:
+```yaml
+✅ metadata:
+     author: your-github-username
+     version: "1.0"
+     category: implementation
+     last_updated: 2026-01-17
+     spawnable: true
+     permissions: full
+
+✅ metadata:
+     author: dsmj-ai-toolkit
+     version: "2.0"
+     category: review
+     last_updated: 2026-01-17
+     spawnable: true
+     permissions: read-only
+
+❌ metadata:
+     author: ""  # Empty author
+     version: 1.0  # Not quoted
+     category: other  # Invalid category
+```
+
 #### `permissionMode`
 **Purpose**: How to handle permission prompts
 
@@ -192,9 +255,23 @@ disallowedTools: [Write, Edit]
 ```yaml
 ---
 name: code-reviewer
-description: Quality assurance specialist. Reviews code quality, runs automated tests (unit, integration, e2e), checks OWASP security vulnerabilities, and validates patterns. Use when code needs quality review, security audit, or test verification.
-tools: [Read, Grep, Glob, Bash]
+description: >
+  Quality assurance specialist. Reviews code quality, runs automated tests, checks security.
+  Trigger: When code needs review, when running tests, when checking OWASP compliance,
+  when validating patterns, when user requests QA.
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
 model: sonnet
+metadata:
+  author: dsmj-ai-toolkit
+  version: "2.0"
+  category: review
+  last_updated: 2026-01-17
+  spawnable: true
+  permissions: read-only
 ---
 ```
 
@@ -202,9 +279,26 @@ model: sonnet
 ```yaml
 ---
 name: code-writer
-description: Implementation specialist. Writes production-quality code following project patterns, handles database migrations, creates API endpoints. Use when implementing features, fixing bugs, or refactoring code. Does NOT commit or test.
-tools: [Read, Write, Edit, Grep, Glob, Bash, Task]
+description: >
+  Implementation specialist with full write access for production-quality code.
+  Trigger: When implementing features, when writing new code, when modifying existing code,
+  when user requests code implementation, when orchestrator assigns implementation task.
+tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - Task
 model: sonnet
+metadata:
+  author: dsmj-ai-toolkit
+  version: "2.0"
+  category: implementation
+  last_updated: 2026-01-17
+  spawnable: true
+  permissions: full
 ---
 ```
 
@@ -212,9 +306,23 @@ model: sonnet
 ```yaml
 ---
 name: planner
-description: Requirements and planning specialist. Gathers requirements, creates user stories, makes architecture decisions, evaluates technical approaches, and breaks tasks into implementation steps. Use before starting implementation to plan approach and identify risks.
-tools: [Read, Grep, Glob]
+description: >
+  Requirements and planning specialist. Creates architecture, evaluates approaches.
+  Trigger: When planning implementation, when making architecture decisions,
+  when evaluating technical approaches, when user needs requirements gathering,
+  when breaking tasks into implementation steps.
+tools:
+  - Read
+  - Grep
+  - Glob
 model: opus
+metadata:
+  author: dsmj-ai-toolkit
+  version: "2.0"
+  category: planning
+  last_updated: 2026-01-17
+  spawnable: true
+  permissions: read-only
 ---
 ```
 
@@ -233,7 +341,25 @@ Every agent must have these sections:
 **Brief tagline describing core function**
 ```
 
-#### 2. Core Identity
+#### 2. When to Spawn This Agent
+```markdown
+## When to Spawn This Agent
+
+**Spawn this agent when**:
+- ✅ Specific condition or scenario 1
+- ✅ Specific condition or scenario 2
+- ✅ Specific condition or scenario 3
+
+**Don't spawn this agent when**:
+- ❌ Different scenario better handled by another agent
+- ❌ Task is too simple or requires different approach
+
+**Example triggers**:
+- "User request pattern 1"
+- "User request pattern 2"
+```
+
+#### 3. Core Identity
 ```markdown
 ## Core Identity
 
@@ -241,7 +367,7 @@ Every agent must have these sections:
 **Best for**: List of ideal use cases
 ```
 
-#### 3. Critical Rules
+#### 4. Critical Rules
 ```markdown
 ## Critical Rules (Inherited from CLAUDE.md)
 
@@ -253,7 +379,7 @@ Every agent must have these sections:
 
 Select 3-5 most relevant from the 9 core rules.
 
-#### 4. Your Workflow
+#### 5. Your Workflow
 ```markdown
 ## Your Workflow
 
@@ -268,7 +394,46 @@ Select 3-5 most relevant from the 9 core rules.
 
 Break work into clear phases (2-5 phases typical).
 
-#### 5. Quality Checks
+#### 6. Response Examples
+```markdown
+## Response Examples
+
+### ✅ GOOD: Effective Agent Response
+
+**User Request**: "Realistic example request"
+
+**Agent Response**:
+[Clear, structured response showing the agent following its workflow]
+
+**Why this is good**:
+- Specific reasons
+
+### ❌ BAD: Ineffective Agent Response
+
+**User Request**: "Same example request"
+
+**Agent Response**:
+[Example of poor response]
+
+**Why this is bad**:
+- Specific reasons
+```
+
+#### 7. Anti-Patterns
+```markdown
+## Anti-Patterns
+
+**What NOT to do**:
+
+❌ **Anti-Pattern 1: [Name]**
+- Description of what the bad practice looks like
+- Why it's problematic
+- What to do instead
+```
+
+Include at least 3 anti-patterns.
+
+#### 8. Quality Checks
 ```markdown
 ## Quality Checks
 
@@ -277,7 +442,34 @@ Before completing, verify:
 ✅ Check 2
 ```
 
-#### 6. What You Do vs Don't Do
+#### 9. Performance Guidelines
+```markdown
+## Performance Guidelines
+
+**For optimal results**:
+- Guideline 1: Specific advice for this agent's performance
+- Guideline 2: How to handle edge cases
+
+**Model recommendations**:
+- Use **haiku** for: Simple tasks
+- Use **sonnet** for: Standard tasks (default)
+- Use **opus** for: Complex tasks requiring deep analysis
+```
+
+#### 10. Success Criteria
+```markdown
+## Success Criteria
+
+**This agent succeeds when**:
+- ✅ Success criterion 1
+- ✅ Success criterion 2
+
+**This agent fails when**:
+- ❌ Failure scenario 1
+- ❌ Failure scenario 2
+```
+
+#### 11. What You Do vs Don't Do
 ```markdown
 ## What You Do vs What You Don't Do
 
@@ -285,7 +477,16 @@ Before completing, verify:
 **❌ You DON'T**: What's outside scope
 ```
 
-#### 7. Example
+#### 12. Keywords
+```markdown
+## Keywords
+
+`keyword1`, `keyword2`, `keyword3`, `keyword4`, `keyword5`
+```
+
+Include 5-10 keywords that help identify when this agent should be used.
+
+#### 13. Example
 ```markdown
 ## Example: [Concrete Scenario]
 
@@ -297,12 +498,28 @@ Before completing, verify:
 
 Always include at least one complete example.
 
+#### 14. Validation Checklist
+```markdown
+## Validation Checklist
+
+**Frontmatter**:
+- [ ] Valid YAML frontmatter with all required fields
+- [ ] Description includes "Trigger:" clause with 3+ specific conditions
+- [ ] Metadata complete
+
+**Content Structure**:
+- [ ] "When to Spawn This Agent" with ✅ and ❌ conditions
+- [ ] Clear workflow with 3+ phases
+- [ ] Response Examples showing ✅ GOOD vs ❌ BAD
+- [ ] Anti-Patterns section with 3+ patterns
+```
+
 ### Optional Sections
 
 Add these if relevant:
 
 - **Special Cases**: Scenarios requiring different approach
-- **Communication Style**: Professional vs Maestro mode
+- **Communication Style**: Tone and style adaptations
 - **When to Stop and Ask**: Conditions requiring user input
 - **Philosophy**: Guiding principle (optional)
 
@@ -530,20 +747,18 @@ Define what to do when stuck:
 - "Breaking change detected - proceed?"
 ```
 
-### 9. Communication Modes
+### 9. Communication Style
 
-Support both professional and Maestro modes:
+Agents should adapt to the communication style specified in the main CLAUDE.md file:
 
 ```markdown
 ## Communication Style
 
-**Professional**:
+The agent respects the communication style set in `.claude/CLAUDE.md`.
+All responses should maintain technical accuracy while adapting tone as configured.
+
+Example (Professional - default):
 "I've implemented the authentication system. Tests passing."
-
-**Maestro Mode**:
-"Dale, auth system is listo! Tests passing, chévere!"
-
-**Key**: Professional = default, Maestro = optional friendly style
 ```
 
 ### 10. Model Selection
@@ -619,30 +834,6 @@ Security Analysis:
 Recommendation: Add CORS middleware before deployment.
 ```
 
-### Maestro Mode (Optional)
-
-**Activated by**: `/maestro` or "use maestro mode" in main conversation
-
-**Characteristics**:
-- Casual, friendly
-- Spanish slangs: ojo, chévere, dale, bacano, listo
-- English slangs: bet, lowkey, ngl, fr, valid
-- Still technical and accurate
-
-**Example**:
-```
-Dale, I checked the auth code!
-
-Security vibes:
-✅ Password hashing looking good, chévere
-✅ JWT tokens expire, bet
-⚠️  Ojo - no CORS configured, that's risky fr
-
-Lowkey recommend adding CORS before we ship this, listo?
-```
-
-**CRITICAL**: Maestro changes ONLY communication style. All rules, quality gates, and technical standards still apply.
-
 ### Status Updates
 
 Keep users informed during long tasks:
@@ -680,30 +871,40 @@ Before finalizing agent:
 
 ✅ **YAML Frontmatter**:
 - name: Valid format (kebab-case, <64 chars)
-- description: Clear triggers + capabilities (<1024 chars)
+- description: Clear triggers + capabilities (<1024 chars) with "Trigger:" clause
 - tools: Minimal necessary permissions
 - model: Appropriate choice (sonnet default)
+- metadata: All required fields (author, version, category, last_updated, spawnable, permissions)
 
 ✅ **Structure**:
+- When to Spawn This Agent section (with ✅ and ❌ conditions)
 - Core Identity section
 - Critical Rules section
 - Workflow phases (2-5)
+- Response Examples (✅ GOOD vs ❌ BAD)
+- Anti-Patterns section (3+ patterns)
 - Quality Checks section
+- Performance Guidelines section
+- Success Criteria section
 - What You Do vs Don't Do
+- Keywords section (5-10 keywords)
 - At least one complete example
+- Validation Checklist section
 
 ✅ **Content**:
 - Single responsibility
 - Clear boundaries
 - Skill references explained
 - Error handling defined
-- Both communication modes shown
+- Communication style adaptable
+- Explicit trigger conditions in frontmatter
 
 ✅ **Practical**:
 - Solves real problem
 - Non-overlapping with other agents
 - Works with toolkit architecture
 - Testable workflow
+- Follows validation workflow
 
 ---
 
@@ -889,7 +1090,7 @@ Verify:
 
 - Ambiguous requirements (should ask questions)
 - Error conditions (should handle gracefully)
-- Maestro mode (if supported)
+- Different communication styles (if supported)
 
 ---
 
@@ -899,25 +1100,34 @@ Before adding agent to toolkit:
 
 **YAML Frontmatter**:
 - [ ] name: Valid kebab-case, <64 chars
-- [ ] description: Clear triggers + capabilities, <1024 chars
+- [ ] description: Clear triggers + capabilities, <1024 chars, includes "Trigger:" clause
 - [ ] tools: Minimal necessary permissions listed
-- [ ] model: Appropriate choice (or omitted for default)
+- [ ] model: Appropriate choice (sonnet default)
+- [ ] metadata: All fields complete (author, version, category, last_updated, spawnable, permissions)
 
 **Structure**:
 - [ ] Title & tagline
+- [ ] When to Spawn This Agent section
 - [ ] Core Identity section
 - [ ] Critical Rules (references CLAUDE.md)
-- [ ] Workflow with phases
+- [ ] Workflow with phases (2-5)
+- [ ] Response Examples (✅ GOOD vs ❌ BAD)
+- [ ] Anti-Patterns section (3+ patterns)
 - [ ] Quality Checks section
+- [ ] Performance Guidelines section
+- [ ] Success Criteria section
 - [ ] What You Do vs Don't Do
+- [ ] Keywords section (5-10 keywords)
 - [ ] At least one complete example
+- [ ] Validation Checklist section
 
 **Content Quality**:
 - [ ] Single, clear responsibility
 - [ ] Non-overlapping with other agents
 - [ ] Skill references with context
 - [ ] Error handling defined
-- [ ] Both communication modes (if relevant)
+- [ ] Communication style adaptable
+- [ ] Explicit trigger conditions
 - [ ] Under 500 lines (or split with references/)
 
 **Testing**:
@@ -925,11 +1135,13 @@ Before adding agent to toolkit:
 - [ ] Tools work as expected
 - [ ] Quality checks execute
 - [ ] Edge cases handled
+- [ ] Trigger conditions validated
 
 **Documentation**:
 - [ ] Clear when to use vs other agents
 - [ ] Examples are realistic
 - [ ] Integrates with toolkit workflow
+- [ ] Validation checklist complete
 
 ---
 
@@ -956,5 +1168,5 @@ Before adding agent to toolkit:
 
 ---
 
-**Version**: 1.0
-**Last Updated**: 2026-01-15
+**Version**: 2.0
+**Last Updated**: 2026-01-17

@@ -185,18 +185,6 @@ Recommendation: Fix critical issues before deployment.
 Full report below.
 ```
 
-**Maestro Mode**:
-```
-Ojo, security audit done!
-
-Found 2 critical issues, ngl:
-- SQL injection in user search - that's bad fr
-- Hardcoded API key - lowkey dangerous
-
-Dale, we gotta fix these before shipping, bet?
-Report below 👇
-```
-
 ---
 
 ## When to Stop and Ask

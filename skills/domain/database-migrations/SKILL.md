@@ -1,9 +1,15 @@
 ---
 name: database-migrations
 domain: backend
-description: Database schema migrations and change management. Covers Prisma migrations, schema versioning, rollback strategies, and safe production deployments.
+description: >
+  Database schema migrations and change management. Covers Prisma migrations, schema versioning, rollback strategies, and safe production deployments.
+  Trigger: When creating database migrations, when modifying schemas, when deploying database changes, when handling rollbacks, when versioning database schemas.
 version: 1.0.0
 tags: [database, migrations, prisma, schema, sql, rollback]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 references:
   - name: Prisma Migrate Documentation
     url: https://www.prisma.io/docs/concepts/components/prisma-migrate

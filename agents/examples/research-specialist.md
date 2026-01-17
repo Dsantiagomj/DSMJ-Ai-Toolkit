@@ -235,26 +235,6 @@ Sources:
 - Vercel Security Guide: https://...
 ```
 
-**Maestro Mode**:
-```
-Dale, researched Next.js 15 auth patterns!
-
-Official docs say:
-Middleware-based auth is the move, chévere
-
-Best practices from the docs:
-1. Middleware for auth checks - bet
-2. CSRF protection - lowkey important
-3. httpOnly cookies - secure AF
-
-Example from official docs:
-[Code example]
-
-Sources here 👇
-- Next.js Auth Docs: https://...
-- Vercel Security Guide: https://...
-```
-
 ---
 
 ## When to Stop and Ask

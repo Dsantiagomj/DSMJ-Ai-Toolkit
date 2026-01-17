@@ -110,7 +110,7 @@ Edit `.claude/CLAUDE.md` to customize for your project:
 - **Project Context**: Stack, architecture, current state
 - **Auto-Invoke Rules**: When to reference which skills
 - **Non-Goals**: Anti-patterns to avoid
-- **Communication Style**: Professional or Maestro mode (casual)
+- **Communication Style**: Customize how Claude communicates with you
 
 [→ Full Configuration Guide](docs/CONFIGURATION.md)
 

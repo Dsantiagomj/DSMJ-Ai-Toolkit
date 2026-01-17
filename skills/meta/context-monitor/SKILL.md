@@ -1,12 +1,16 @@
 ---
 name: context-monitor
 version: 1.0.0
-description: Detects context drift, conversation unfocus, and suggests refocusing strategies. Auto-invokes when conversations exceed thresholds or show patterns of confusion.
+description: >
+  Detects context drift, conversation unfocus, and suggests refocusing strategies.
+  Trigger: When conversation exceeds 50 messages, when multiple topics are mixed, when repeated errors occur, when confusion patterns are detected.
 tags: [meta, context, monitoring, drift, focus]
 author: dsmj-ai-toolkit
 metadata:
   auto_invoke: "Conversation exceeds 50 messages, multiple topics mixed, repeated errors, or confusion patterns detected"
   category: meta
+  version: "1.0"
+  last_updated: "2026-01-17"
 ---
 
 # Context Monitor Skill

@@ -1,9 +1,15 @@
 ---
 name: vercel-ai-sdk
 domain: backend
-description: AI integration with Vercel AI SDK - Build AI-powered applications with streaming, function calling, and tool use. Covers React hooks, streaming responses, OpenAI integration, and structured outputs.
+description: >
+  AI integration with Vercel AI SDK - Build AI-powered applications with streaming, function calling, and tool use.
+  Trigger: When implementing AI features, when using useChat or useCompletion, when building chatbots, when integrating LLMs, when implementing function calling.
 version: 1.0.0
 tags: [ai, vercel, openai, streaming, llm, react, nextjs]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: Vercel AI SDK Documentation
     url: https://sdk.vercel.ai/docs

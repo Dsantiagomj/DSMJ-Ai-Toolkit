@@ -1,9 +1,15 @@
 ---
 name: react-hook-form
 domain: frontend
-description: Performant form management with React Hook Form. Covers form state, validation with Zod, field arrays, form submission, and error handling.
+description: >
+  Performant form management with React Hook Form. Covers form state, validation with Zod, field arrays, form submission, and error handling.
+  Trigger: When building forms, when implementing form validation, when handling form submissions, when using Zod schema validation.
 version: 1.0.0
 tags: [forms, react-hook-form, validation, zod, typescript, react]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: React Hook Form Documentation
     url: https://react-hook-form.com/

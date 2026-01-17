@@ -1,9 +1,15 @@
 ---
 name: api-design
 domain: backend
-description: REST and GraphQL API design patterns. Covers HTTP methods, status codes, versioning, pagination, error handling, schema design, mutations, and API best practices.
+description: >
+  REST and GraphQL API design patterns. Covers HTTP methods, status codes, versioning, pagination, error handling, schema design, mutations, and API best practices.
+  Trigger: When designing APIs, when creating REST endpoints, when implementing GraphQL schemas, when handling API versioning, when designing pagination.
 version: 1.0.0
 tags: [api, rest, graphql, http, backend, api-versioning, pagination]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 references:
   - name: GraphQL Documentation
     url: https://graphql.org/learn/

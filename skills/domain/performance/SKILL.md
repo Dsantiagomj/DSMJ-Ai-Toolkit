@@ -1,9 +1,15 @@
 ---
 name: performance
 domain: frontend
-description: Web performance optimization and Core Web Vitals. Covers LCP, FID, CLS, code splitting, lazy loading, caching strategies, image optimization, and performance monitoring.
+description: >
+  Web performance optimization and Core Web Vitals. Covers LCP, FID, CLS, code splitting, lazy loading, caching strategies, image optimization, and performance monitoring.
+  Trigger: When optimizing performance, when improving Core Web Vitals, when implementing code splitting, when optimizing images, when setting up caching, when monitoring performance metrics.
 version: 1.0.0
 tags: [performance, core-web-vitals, optimization, caching, lazy-loading, bundle-optimization]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 references:
   - name: Web.dev Learn Performance
     url: https://web.dev/learn/performance

@@ -1,0 +1,224 @@
+name: Validate Agents
+
+on:
+  pull_request:
+    paths:
+      - 'agents/**/*.md'
+      - '!agents/CATALOG.md'
+      - '!agents/GUIDE.md'
+      - '!agents/TEMPLATE.md'
+      - '!agents/examples/README.md'
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/**/*.md'
+
+jobs:
+  validate-agent-format:
+    runs-on: ubuntu-latest
+    name: Validate Agent Format
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            agents/*.md
+            agents/examples/*.md
+
+      - name: Validate YAML frontmatter
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating YAML frontmatter in changed agents..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking $file"
+
+            # Check if file starts with ---
+            if ! head -n 1 "$file" | grep -q "^---$"; then
+              echo "❌ ERROR: $file does not start with YAML frontmatter (---)"
+              exit 1
+            fi
+
+            # Extract frontmatter (between first and second ---)
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$file" | sed '1d;$d')
+
+            # Check required fields
+            if ! echo "$frontmatter" | grep -q "^name:"; then
+              echo "❌ ERROR: $file missing 'name:' field in frontmatter"
+              exit 1
+            fi
+
+            if ! echo "$frontmatter" | grep -q "^description:"; then
+              echo "❌ ERROR: $file missing 'description:' field in frontmatter"
+              exit 1
+            fi
+
+            # Check description contains "Trigger:"
+            description=$(echo "$frontmatter" | sed -n '/^description:/,/^[a-z]/p' | sed '$d')
+            if ! echo "$description" | grep -qi "trigger:"; then
+              echo "❌ ERROR: $file description must include 'Trigger:' clause"
+              exit 1
+            fi
+
+            # Check tools field
+            if ! echo "$frontmatter" | grep -q "^tools:"; then
+              echo "❌ ERROR: $file missing 'tools:' field"
+              exit 1
+            fi
+
+            # Check model field
+            if ! echo "$frontmatter" | grep -q "^model:"; then
+              echo "❌ ERROR: $file missing 'model:' field"
+              exit 1
+            fi
+
+            # Check metadata section
+            if ! echo "$frontmatter" | grep -q "^metadata:"; then
+              echo "❌ ERROR: $file missing 'metadata:' section"
+              exit 1
+            fi
+
+            # Check metadata.author
+            if ! echo "$frontmatter" | grep -q "author:"; then
+              echo "❌ ERROR: $file missing 'metadata.author' field"
+              exit 1
+            fi
+
+            # Check metadata.version
+            if ! echo "$frontmatter" | grep -q "version:"; then
+              echo "❌ ERROR: $file missing 'metadata.version' field"
+              exit 1
+            fi
+
+            # Check metadata.category
+            if ! echo "$frontmatter" | grep -q "category:"; then
+              echo "❌ ERROR: $file missing 'metadata.category' field"
+              exit 1
+            fi
+
+            echo "✅ $file YAML frontmatter is valid"
+          done
+
+      - name: Validate required sections
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating required sections in changed agents..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking sections in $file"
+
+            # Check for required sections (case-insensitive)
+            if ! grep -qi "^## When to Spawn" "$file"; then
+              echo "❌ ERROR: $file missing '## When to Spawn' section"
+              exit 1
+            fi
+
+            if ! grep -qi "^## Core Identity" "$file"; then
+              echo "❌ ERROR: $file missing '## Core Identity' section"
+              exit 1
+            fi
+
+            if ! grep -qi "^## Your Workflow" "$file" && ! grep -qi "^## Workflow" "$file"; then
+              echo "❌ ERROR: $file missing '## Your Workflow' or '## Workflow' section"
+              exit 1
+            fi
+
+            if ! grep -qi "^## Response Examples" "$file" && ! grep -qi "^## Examples" "$file"; then
+              echo "❌ ERROR: $file missing '## Response Examples' or '## Examples' section"
+              exit 1
+            fi
+
+            if ! grep -qi "^## Anti-Patterns" "$file"; then
+              echo "⚠️  WARNING: $file missing '## Anti-Patterns' section (recommended)"
+            fi
+
+            if ! grep -qi "^## Quality Checks" "$file"; then
+              echo "⚠️  WARNING: $file missing '## Quality Checks' section (recommended)"
+            fi
+
+            if ! grep -qi "^## Keywords" "$file"; then
+              echo "⚠️  WARNING: $file missing '## Keywords' section (recommended)"
+            fi
+
+            echo "✅ $file has required sections"
+          done
+
+      - name: Validate response examples
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating response examples in changed agents..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking response examples in $file"
+
+            # Check for GOOD/BAD examples
+            if grep -qi "^## Response Examples" "$file" || grep -qi "^## Examples" "$file"; then
+              if ! grep -q "✅ GOOD" "$file" && ! grep -q "✅ Good" "$file"; then
+                echo "⚠️  WARNING: $file Response Examples should include ✅ GOOD example"
+              fi
+
+              if ! grep -q "❌ BAD" "$file" && ! grep -q "❌ Bad" "$file"; then
+                echo "⚠️  WARNING: $file Response Examples should include ❌ BAD example"
+              fi
+            fi
+
+            echo "✅ $file response examples checked"
+          done
+
+      - name: Validate anti-patterns
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating anti-patterns in changed agents..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking anti-patterns in $file"
+
+            # If Anti-Patterns section exists, check it has content
+            if grep -qi "^## Anti-Patterns" "$file"; then
+              # Count ❌ symbols after Anti-Patterns section (should have at least 3)
+              anti_patterns=$(sed -n '/^## Anti-Patterns/,/^##/p' "$file" | grep -c "❌" || true)
+
+              if [ "$anti_patterns" -lt 3 ]; then
+                echo "⚠️  WARNING: $file Anti-Patterns section should have at least 3 patterns (found: $anti_patterns)"
+              else
+                echo "✅ $file has $anti_patterns anti-patterns"
+              fi
+            fi
+          done
+
+      - name: Validate code blocks
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating code blocks in changed agents..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking code blocks in $file"
+
+            # Count code blocks (lines starting with ```)
+            code_blocks=$(grep -c "^\\`\\`\\`" "$file" || true)
+
+            # Should have at least 4 code blocks (workflow examples, response examples)
+            if [ "$code_blocks" -lt 4 ]; then
+              echo "⚠️  WARNING: $file has only $code_blocks code blocks (recommended: 4+)"
+            else
+              echo "✅ $file has $code_blocks code blocks"
+            fi
+          done
+
+      - name: Summary
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "✅ All agent validations passed!"
+          echo ""
+          echo "Validated files:"
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "  - $file"
+          done

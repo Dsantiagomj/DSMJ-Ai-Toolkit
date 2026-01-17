@@ -1,0 +1,152 @@
+name: Validate Skills
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**/*.md'
+      - '!skills/CATALOG.md'
+      - '!skills/GUIDE.md'
+      - '!skills/TEMPLATE.md'
+  push:
+    branches:
+      - main
+    paths:
+      - 'skills/**/*.md'
+
+jobs:
+  validate-skill-format:
+    runs-on: ubuntu-latest
+    name: Validate Skill Format
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            skills/**/SKILL.md
+
+      - name: Validate YAML frontmatter
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating YAML frontmatter in changed skills..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking $file"
+
+            # Check if file starts with ---
+            if ! head -n 1 "$file" | grep -q "^---$"; then
+              echo "❌ ERROR: $file does not start with YAML frontmatter (---)"
+              exit 1
+            fi
+
+            # Extract frontmatter (between first and second ---)
+            frontmatter=$(sed -n '/^---$/,/^---$/p' "$file" | sed '1d;$d')
+
+            # Check required fields
+            if ! echo "$frontmatter" | grep -q "^name:"; then
+              echo "❌ ERROR: $file missing 'name:' field in frontmatter"
+              exit 1
+            fi
+
+            if ! echo "$frontmatter" | grep -q "^description:"; then
+              echo "❌ ERROR: $file missing 'description:' field in frontmatter"
+              exit 1
+            fi
+
+            # Check description contains "Trigger:"
+            description=$(echo "$frontmatter" | sed -n '/^description:/,/^[a-z]/p' | sed '$d')
+            if ! echo "$description" | grep -qi "trigger:"; then
+              echo "❌ ERROR: $file description must include 'Trigger:' clause"
+              exit 1
+            fi
+
+            # Check metadata section
+            if ! echo "$frontmatter" | grep -q "^metadata:"; then
+              echo "❌ ERROR: $file missing 'metadata:' section"
+              exit 1
+            fi
+
+            # Check metadata.author
+            if ! echo "$frontmatter" | grep -q "author:"; then
+              echo "❌ ERROR: $file missing 'metadata.author' field"
+              exit 1
+            fi
+
+            # Check metadata.version
+            if ! echo "$frontmatter" | grep -q "version:"; then
+              echo "❌ ERROR: $file missing 'metadata.version' field"
+              exit 1
+            fi
+
+            echo "✅ $file YAML frontmatter is valid"
+          done
+
+      - name: Validate required sections
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating required sections in changed skills..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking sections in $file"
+
+            # Check for required sections (case-insensitive)
+            if ! grep -qi "^## When to Use" "$file" && ! grep -qi "^## Trigger" "$file"; then
+              echo "❌ ERROR: $file missing '## When to Use' or '## Trigger' section"
+              exit 1
+            fi
+
+            if ! grep -qi "^## Critical Patterns" "$file" && ! grep -qi "^## Core Patterns" "$file"; then
+              echo "❌ ERROR: $file missing '## Critical Patterns' or '## Core Patterns' section"
+              exit 1
+            fi
+
+            if ! grep -qi "^## Code Examples" "$file" && ! grep -qi "^## Examples" "$file"; then
+              echo "❌ ERROR: $file missing '## Code Examples' or '## Examples' section"
+              exit 1
+            fi
+
+            if ! grep -qi "^## Anti-Patterns" "$file"; then
+              echo "⚠️  WARNING: $file missing '## Anti-Patterns' section (recommended)"
+            fi
+
+            if ! grep -qi "^## Keywords" "$file"; then
+              echo "⚠️  WARNING: $file missing '## Keywords' section (recommended)"
+            fi
+
+            echo "✅ $file has required sections"
+          done
+
+      - name: Validate code blocks
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "Validating code blocks in changed skills..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Checking code blocks in $file"
+
+            # Count code blocks (lines starting with ```)
+            code_blocks=$(grep -c "^\`\`\`" "$file" || true)
+
+            # Should have at least 6 code blocks (3 patterns with good/bad examples)
+            if [ "$code_blocks" -lt 6 ]; then
+              echo "⚠️  WARNING: $file has only $code_blocks code blocks (recommended: 6+)"
+            else
+              echo "✅ $file has $code_blocks code blocks"
+            fi
+          done
+
+      - name: Summary
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          echo "✅ All skill validations passed!"
+          echo ""
+          echo "Validated files:"
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "  - $file"
+          done

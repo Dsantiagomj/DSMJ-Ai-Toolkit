@@ -1,0 +1,87 @@
+name: Validate Conventional Commits
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-commits:
+    runs-on: ubuntu-latest
+    name: Validate Commit Messages
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate conventional commits
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: .commitlintrc.json
+          failOnWarnings: false
+          helpURL: https://www.conventionalcommits.org/
+
+      - name: Comment on PR (if validation fails)
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = `## ❌ Commit Message Validation Failed
+
+            Your commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+
+            ### Format
+            \`\`\`
+            <type>(<scope>): <description>
+
+            [optional body]
+
+            [optional footer(s)]
+            \`\`\`
+
+            ### Valid Types
+            - **feat**: New feature
+            - **fix**: Bug fix
+            - **docs**: Documentation changes
+            - **style**: Code style changes (formatting, etc.)
+            - **refactor**: Code refactoring
+            - **perf**: Performance improvements
+            - **test**: Adding or updating tests
+            - **build**: Build system changes
+            - **ci**: CI/CD changes
+            - **chore**: Other changes that don't modify src or test files
+            - **revert**: Revert a previous commit
+
+            ### Valid Scopes (examples)
+            - **skills**: Changes to skills
+            - **agents**: Changes to agents
+            - **templates**: Changes to templates
+            - **docs**: Changes to documentation
+            - **core**: Changes to core functionality
+
+            ### Examples
+            \`\`\`
+            feat(skills): add react-19 skill
+            fix(agents): correct code-writer spawn logic
+            docs(readme): update installation instructions
+            refactor(skills): simplify security skill structure
+            \`\`\`
+
+            ### How to Fix
+            1. Rebase your commits and reword them following the format above
+            2. Force push to your branch
+            3. The validation will run again automatically
+
+            \`\`\`bash
+            git rebase -i HEAD~n  # where n is the number of commits to reword
+            git push --force-with-lease
+            \`\`\`
+            `;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });

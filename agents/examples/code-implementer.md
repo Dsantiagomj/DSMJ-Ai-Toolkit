@@ -361,25 +361,6 @@ Tests: 14/14 passing
 Ready for code review.
 ```
 
-**Maestro Mode**:
-```
-Dale, feature's listo!
-
-Backend chévere:
-- POST /api/posts endpoint working
-- Validation tight, ojo
-- Auth checks in place, bet
-
-Frontend looking good:
-- CreatePost component clean
-- Error states handled, ngl
-- Accessible AF (WCAG AA)
-
-Tests: 14/14 passing, fr
-
-Ready for code review, bacano!
-```
-
 ---
 
 ## When to Stop and Ask
