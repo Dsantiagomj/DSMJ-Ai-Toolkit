@@ -1,227 +1,246 @@
 ---
 name: skill-name
-description: Clear description of what this skill does and when to use it. Include both capabilities and specific triggers/contexts. This is the PRIMARY mechanism for Claude to understand when to use this skill.
-tags: [category1, category2, category3]
-author: your-name
+description: >
+  Brief description of what this skill covers.
+  Trigger: When working with [technology], when building [type of app], when using [library].
 metadata:
-  auto_invoke: "When writing [specific code/files], handling [specific feature], or working with [specific patterns]"
+  author: your-github-username
+  version: "1.0"
   category: stack|domain|meta
-  progressive_disclosure: true|false
+  last_updated: YYYY-MM-DD
 ---
 
-# Skill Name - One-Line Purpose
+# Skill Name
 
-**Brief tagline describing the skill's domain knowledge**
+> Brief tagline describing the skill's domain knowledge
 
----
+## When to Use
 
-## Overview
+Load this skill when:
+- [Condition 1, e.g., "Working with React Server Components"]
+- [Condition 2, e.g., "Building Next.js 15 applications"]
+- [Condition 3, e.g., "Using App Router patterns"]
 
-**What this skill provides**: [Brief description]
-**When to use**: [Specific scenarios]
-**Key concepts**: [Core knowledge areas]
+## Critical Patterns
 
----
+### Pattern 1: [Name]
 
-## Core Concepts
+[Brief explanation of the pattern and why it matters]
 
-### Concept 1: [Name]
+```typescript
+// ✅ GOOD: Correct implementation
+const example = () => {
+  // Implementation following best practices
+};
 
-**What it is**:
-- Explanation of concept
-- Why it matters
-- Common use cases
-
-**Best practices**:
-✅ Do this
-✅ Do that
-❌ Don't do this
-❌ Don't do that
-
-**Example**:
-```language
-// Code example demonstrating concept
+// ❌ BAD: Common mistake to avoid
+const badExample = () => {
+  // What NOT to do
+};
 ```
 
-### Concept 2: [Name]
+**When to use**: [Specific scenario]
 
-**What it is**:
+### Pattern 2: [Name]
+
 [Explanation]
 
-**When to use**:
-- Scenario 1
-- Scenario 2
+```typescript
+// ✅ GOOD: Recommended approach
+const correctWay = () => {
+  // Your code here
+};
 
-**Example**:
-```language
-// Code example
+// ❌ BAD: Anti-pattern
+const wrongWay = () => {
+  // What to avoid
+};
 ```
 
----
+**When to use**: [Specific scenario]
 
-## Patterns & Best Practices
+### Pattern 3: [Name]
 
-### Pattern 1: [Pattern Name]
+[Explanation]
 
-**Use when**: [Scenario]
+```typescript
+// ✅ GOOD
+// Example
 
-**Implementation**:
-```language
-// Complete working example
-```
-
-**Why this works**:
-- Reason 1
-- Reason 2
-
-**Common mistakes**:
-❌ Mistake 1
-✅ Instead do: Correct approach
-
-### Pattern 2: [Pattern Name]
-
-**Use when**: [Scenario]
-
-**Implementation**:
-```language
+// ❌ BAD
 // Example
 ```
 
----
+## Code Examples
 
-## Common Scenarios
+### Example 1: [Common Use Case]
 
-### Scenario 1: [Description]
+**Scenario**: [What user is trying to accomplish]
 
-**Problem**: What user is trying to accomplish
+```typescript
+// Complete working example showing the pattern in action
+import { something } from 'library';
 
-**Solution**:
-```language
-// Step-by-step code example
+function CompleteExample() {
+  // Full implementation
+  return result;
+}
 ```
 
-**Explanation**:
-- Why this approach
-- What to watch out for
+**Key points**:
+- Point 1 explaining the code
+- Point 2 highlighting best practice
+- Point 3 noting important detail
 
-### Scenario 2: [Description]
+### Example 2: [Another Use Case]
 
-**Problem**: [Description]
+**Scenario**: [Description]
 
-**Solution**:
-[Code and explanation]
+```typescript
+// Another complete example
+function AnotherExample() {
+  // Implementation
+}
+```
 
----
+### Example 3: [Edge Case or Advanced Usage]
+
+**Scenario**: [Description]
+
+```typescript
+// Edge case handling
+function EdgeCaseExample() {
+  // Implementation
+}
+```
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: [Name]
+### Don't: [Anti-pattern Name]
 
-**Don't do this**:
-```language
-// Bad example
+**Why this is bad**:
+- Reason 1 (e.g., "Causes unnecessary re-renders")
+- Reason 2 (e.g., "Breaks React's rules")
+- Reason 3 (e.g., "Poor performance")
+
+```typescript
+// ❌ BAD - Don't do this
+function BadPattern() {
+  // What NOT to do
+}
 ```
 
-**Why it's bad**:
-- Reason 1
-- Reason 2
-
-**Do this instead**:
-```language
-// Good example
+**Instead, do this**:
+```typescript
+// ✅ GOOD - Correct approach
+function GoodPattern() {
+  // Proper implementation
+}
 ```
 
-### Anti-Pattern 2: [Name]
+### Don't: [Another Anti-pattern]
 
-**Don't do this**:
-[Bad example]
+**Why this is bad**: [Explanation]
 
-**Instead**:
-[Good example]
+```typescript
+// ❌ BAD
+// Example
 
----
+// ✅ GOOD
+// Alternative
+```
+
+## Quick Reference
+
+| Task | Pattern | Notes |
+|------|---------|-------|
+| [Common task 1] | `code snippet` | When to use this |
+| [Common task 2] | `code snippet` | Important gotcha |
+| [Common task 3] | `code snippet` | Best practice tip |
 
 ## Edge Cases & Gotchas
 
 ### Edge Case 1: [Name]
 
-**Scenario**: When this happens
+**When this happens**: [Scenario]
 
-**What to watch for**:
-- Issue 1
-- Issue 2
-
-**How to handle**:
-```language
-// Example handling edge case
+**Solution**:
+```typescript
+// How to handle this edge case
 ```
 
-### Edge Case 2: [Name]
+### Gotcha 1: [Name]
 
-**Scenario**: [Description]
+**Watch out for**: [Common mistake]
 
-**Solution**: [Approach]
-
----
-
-## Quick Reference
-
-### Common Operations
-
-| Operation | Code Pattern | Notes |
-|-----------|-------------|-------|
-| Operation 1 | `code snippet` | When to use |
-| Operation 2 | `code snippet` | Gotchas |
-| Operation 3 | `code snippet` | Best practice |
-
-### Cheat Sheet
-
-**Most common patterns**:
-```language
-// Pattern 1 (80% of use cases)
-
-// Pattern 2 (15% of use cases)
-
-// Pattern 3 (5% of use cases, edge cases)
+**Fix**:
+```typescript
+// Correct approach
 ```
-
----
 
 ## Progressive Disclosure
 
-> **Note**: This skill uses progressive disclosure. Main content covers 80% of use cases.
+> **Note**: This template covers 80% of common use cases. For detailed information:
 
-**For detailed information, see**:
+**Advanced topics** (load when needed):
 - `references/advanced-patterns.md` - Complex scenarios
-- `references/api-reference.md` - Complete API docs
+- `references/api-reference.md` - Complete API documentation
 - `references/migrations.md` - Version upgrade guides
-- `examples/` - Working code examples
+- `examples/` - Additional working examples
 
-**Load these only when**:
-- Facing complex scenario not covered here
+**When to load references**:
+- Facing a complex scenario not covered above
 - Need complete API documentation
-- Migrating between versions
+- Migrating between major versions
+- Building advanced features
 
----
+## Keywords
 
-## Version Information
-
-**Current Version**: [Technology version this skill covers]
-**Last Updated**: [Date]
-**Compatible With**: [Framework/library versions]
-
----
+[technology-name], [framework], [pattern-1], [pattern-2], [use-case], [version]
 
 ## Resources
 
-**Official Documentation**:
-- [Official Docs](URL)
-- [API Reference](URL)
-
-**Community Resources**:
-- [Community Guide](URL)
-- [GitHub Repo](URL)
+- [Official Documentation](https://example.com)
+- [Migration Guide](https://example.com/migration)
+- [Community Resources](https://example.com/community)
 
 ---
 
-_This skill is maintained by dsmj-ai-toolkit. Based on [source] version [X.Y.Z]_
+## Validation Checklist
+
+Before submitting this skill:
+
+### Required Frontmatter
+- [ ] Has `name:` field (lowercase, hyphens only)
+- [ ] Has `description:` with "Trigger:" included
+- [ ] Has `metadata:` with `author:` and `version:`
+- [ ] Has `category:` (stack/domain/meta)
+
+### Required Sections
+- [ ] Has `## When to Use` section with 3+ conditions
+- [ ] Has `## Critical Patterns` with 3+ patterns
+- [ ] Has `## Code Examples` with 3+ complete examples
+- [ ] Has `## Anti-Patterns` section
+- [ ] Has `## Keywords` section
+
+### Code Quality
+- [ ] At least 6 code blocks total (3 patterns + 3 examples minimum)
+- [ ] Each pattern shows both ✅ GOOD and ❌ BAD examples
+- [ ] Examples are complete and runnable
+- [ ] Code uses proper syntax highlighting (```typescript, ```python, etc.)
+
+### Content Quality
+- [ ] Skill is focused on ONE technology/framework
+- [ ] Total length is 100-500 lines (concise, not encyclopedic)
+- [ ] Triggers are specific and clear
+- [ ] Examples solve real-world problems
+- [ ] Anti-patterns explain WHY they're bad
+
+### Git Requirements
+- [ ] All commits use conventional commits format
+  - Example: `feat(skills): add skill-name skill`
+  - Types: feat, fix, docs, refactor, test, chore
+
+---
+
+_Skill template based on Gentleman-Skills format. Maintained by dsmj-ai-toolkit._

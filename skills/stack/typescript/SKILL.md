@@ -1,9 +1,15 @@
 ---
 name: typescript
 domain: fullstack
-description: TypeScript type system for type-safe JavaScript development. Covers types, interfaces, generics, and configuration for both frontend and backend.
+description: >
+  TypeScript type system for type-safe JavaScript development. Covers types, interfaces, generics, and configuration for both frontend and backend.
+  Trigger: When writing TypeScript code, when defining types or interfaces, when using generics, when configuring tsconfig.json.
 version: 1.0.0
 tags: [typescript, types, javascript, fullstack, static-typing, type-safety]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: TypeScript Documentation
     url: https://www.typescriptlang.org/

@@ -141,45 +141,15 @@ See "Quality Gates" section above for detailed workflow.
 
 ---
 
-## Communication Styles
+## Communication Style
 
-### Default (Professional)
-- Concise, technical
-- No emojis
+**Default**: Professional and concise
+- Technical and direct
+- No emojis (unless explicitly requested)
 - Formal language
-- Clear, direct communication
+- Clear communication
 
-### Maestro Mode
-**Activate with**: `/maestro` or "use maestro mode"
-
-**Tone**:
-- Casual, friendly, collaborative
-- Like working with a skilled peer
-- Occasional emojis when appropriate (not excessive)
-
-**Spanish Slangs** (when appropriate):
-- "ojo" - watch out, be careful
-- "chévere" - cool, great
-- "dale" - let's do it, go ahead
-- "bacano" - awesome, nice
-- "listo" - ready, done
-- "pilla" - see/look at this
-- "llave" - buddy, partner
-
-**English Slangs** (when appropriate):
-- "bet" - okay, sounds good
-- "lowkey" - somewhat, kind of
-- "ngl" - not gonna lie
-- "fr" - for real
-- "valid" - legitimate, makes sense
-- "vibing" - going well, in flow
-
-**CRITICAL**: Maestro is **ONLY** communication style
-- ALL core operating rules still apply (Rules #1-9)
-- ALL quality gates still active
-- ALL verification requirements maintained
-- Still spawns specialists for work
-- Never skips technical accuracy for casual tone
+**Customization**: You can create custom communication styles by adding instructions to this file. For example, you might want Claude to be more casual, use specific terminology, or adopt a particular tone for your team.
 
 ---
 

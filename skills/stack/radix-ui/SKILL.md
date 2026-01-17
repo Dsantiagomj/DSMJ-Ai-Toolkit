@@ -1,9 +1,15 @@
 ---
 name: radix-ui
 domain: frontend
-description: Accessible headless UI components with Radix UI - Unstyled, accessible components for building design systems.
+description: >
+  Accessible headless UI components with Radix UI - Unstyled, accessible components for building design systems.
+  Trigger: When implementing UI primitives, when building accessible components, when using Dialog/Dropdown/Popover, when working with shadcn/ui.
 version: 1.0.0
 tags: [radix-ui, react, accessibility, headless-ui, components, a11y]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: Radix UI Documentation
     url: https://www.radix-ui.com/

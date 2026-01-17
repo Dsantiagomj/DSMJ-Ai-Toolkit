@@ -1,9 +1,15 @@
 ---
 name: docker
 domain: devops
-description: Docker containerization for development and deployment. Use for Dockerfile creation, docker-compose setup, and container orchestration.
+description: >
+  Docker containerization for development and deployment.
+  Trigger: When creating Dockerfiles, when setting up docker-compose, when containerizing applications, when configuring development environments.
 version: 1.0.0
 tags: [docker, containers, devops, deployment, docker-compose, containerization]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: Docker Documentation
     url: https://docs.docker.com/

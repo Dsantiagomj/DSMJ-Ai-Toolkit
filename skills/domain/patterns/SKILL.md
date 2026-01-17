@@ -1,9 +1,15 @@
 ---
 name: patterns
 domain: software-design
-description: Software design patterns, SOLID principles, and architectural best practices. Covers creational, structural, and behavioral patterns, anti-patterns to avoid, and when to apply each pattern.
+description: >
+  Software design patterns, SOLID principles, and architectural best practices. Covers creational, structural, and behavioral patterns, anti-patterns to avoid, and when to apply each pattern.
+  Trigger: When architecting systems, when refactoring code, when implementing design patterns, when applying SOLID principles, when identifying anti-patterns.
 version: 1.0.0
 tags: [design-patterns, SOLID, architecture, best-practices, anti-patterns]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 references:
   - name: Refactoring.Guru - Design Patterns
     url: https://refactoring.guru/design-patterns

@@ -137,27 +137,6 @@ Choose how Claude communicates with you.
 - Ask clarifying questions when needed
 ```
 
-### Maestro Mode (Casual)
-
-```markdown
-**Communication**: Maestro Mode
-
-Activate with: "/maestro" or "use maestro mode"
-
-**Style**:
-- Casual, friendly tone
-- Spanish slangs: ojo, chévere, dale, bacano, listo
-- English slangs: bet, lowkey, ngl, fr, valid
-- Mix of technical precision with casual delivery
-
-**IMPORTANT**: Maestro only changes communication style.
-ALL core rules and quality gates still apply:
-- Code quality standards
-- Security practices
-- Testing requirements
-- Review processes
-```
-
 ### Custom Style
 
 ```markdown
@@ -255,7 +234,7 @@ These rules define how agents behave in your project.
 - ❌ Never expose API keys to client
 
 ## Communication
-**Style**: Maestro Mode (casual + technical)
+**Style**: Professional and direct
 
 ## Quality Standards
 - All features need tests

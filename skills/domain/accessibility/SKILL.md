@@ -1,9 +1,15 @@
 ---
 name: accessibility
 domain: frontend
-description: Web accessibility (a11y) patterns and WCAG compliance. Covers WCAG 2.2 Level A/AA/AAA, ARIA attributes, keyboard navigation, screen reader support, color contrast, and semantic HTML.
+description: >
+  Web accessibility (a11y) patterns and WCAG compliance. Covers WCAG 2.2 Level A/AA/AAA, ARIA attributes, keyboard navigation, screen reader support, color contrast, and semantic HTML.
+  Trigger: When implementing accessibility features, when building accessible components, when ensuring WCAG compliance, when adding ARIA attributes, when handling keyboard navigation.
 version: 1.0.0
 tags: [accessibility, a11y, wcag, aria, keyboard-navigation, screen-readers]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 references:
   - name: WCAG 2.2 Guidelines
     url: https://www.w3.org/TR/WCAG22/

@@ -32,10 +32,18 @@ cp skills/TEMPLATE.md skills/category/your-skill/SKILL.md
 ```yaml
 ---
 name: your-skill
-description: What it does and when to use it
-tags: [typescript, react, frontend]
+description: >
+  Brief description of what this skill covers.
+  Trigger: When working with [technology], when building [type of app].
+metadata:
+  author: your-github-username
+  version: "1.0"
+  category: stack|domain|meta
+  last_updated: 2026-01-17
 ---
 ```
+
+**Note**: The description MUST include a "Trigger:" clause that explicitly states when this skill should be loaded.
 
 ### 3. Add Domain Knowledge
 
@@ -88,6 +96,7 @@ Start Claude Code and verify skill loads correctly.
 - **This is the PRIMARY triggering mechanism**
 
 **Best practices**:
+- **MUST include "Trigger:" clause** that explicitly states when to load this skill
 - Include BOTH what the skill provides AND when to use it
 - Be specific about domains covered
 - Front-load important information
@@ -95,13 +104,46 @@ Start Claude Code and verify skill loads correctly.
 
 **Examples**:
 ```yaml
-✅ description: React 19 patterns with Server Components, Actions, and modern hooks. Use when writing React components, JSX files, or working with React-specific features.
+✅ description: >
+  React 19 patterns with Server Components and modern hooks.
+  Trigger: When writing React components or JSX files.
 
-✅ description: OWASP Top 10 security best practices, auth patterns, and secure coding guidelines. Use when implementing authentication, handling user input, or dealing with sensitive data.
+✅ description: >
+  OWASP Top 10 security best practices and auth patterns.
+  Trigger: When implementing authentication or handling user input.
 
-❌ description: React stuff (too vague)
-❌ description: Security (missing when to use)
+❌ description: React stuff (too vague, no trigger)
+❌ description: Security (missing trigger clause)
+❌ description: Use when writing React components (missing what it provides)
 ```
+
+**NEW**: As of v1.1.0, the description field MUST contain an explicit "Trigger:" clause. This is validated automatically via GitHub Actions.
+
+### Required Metadata Section
+
+#### `metadata` (required)
+
+**Purpose**: Additional information for validation and behavior
+
+**Required fields**:
+- `author`: Skill creator (GitHub username recommended)
+- `version`: Skill version (use semantic versioning: "1.0", "1.1", etc.)
+- `category`: One of: `stack`, `domain`, or `meta`
+- `last_updated`: Date in YYYY-MM-DD format
+
+**Example**:
+```yaml
+metadata:
+  author: your-github-username
+  version: "1.0"
+  category: stack
+  last_updated: 2026-01-17
+```
+
+**Categories**:
+- `stack`: Framework/library-specific (React, Next.js, Django, etc.)
+- `domain`: Domain knowledge (Security, Accessibility, API Design, etc.)
+- `meta`: Meta skills (Context monitoring, Skill creation, etc.)
 
 ### Optional Fields
 
@@ -118,27 +160,6 @@ tags: [security, owasp, authentication, authorization]
 tags: [python, django, backend, orm]
 ```
 
-#### `author`
-
-**Purpose**: Attribute skill creator
-
-**Examples**:
-```yaml
-author: dsmj-ai-toolkit
-author: anthropic
-author: your-name
-```
-
-#### `metadata`
-
-**Purpose**: Additional information for skill behavior
-
-**Fields**:
-- `auto_invoke`: When skill should auto-trigger
-- `category`: stack|domain|meta
-- `progressive_disclosure`: true|false
-- `version`: Skill version
-
 **Examples**:
 ```yaml
 metadata:
@@ -153,15 +174,15 @@ metadata:
 **Stack Skill** (React):
 ```yaml
 ---
-name: react
-version: 19.0.0
-description: React 19 patterns with Server Components, Actions, and modern hooks. Use when writing React components, JSX files, or working with React-specific features.
-tags: [react, frontend, javascript, typescript, ui, components]
-author: dsmj-ai-toolkit
+name: react-19
+description: >
+  React 19 patterns with Server Components, Actions, and modern hooks.
+  Trigger: When writing React components, JSX files, or hooks.
 metadata:
-  auto_invoke: "Writing React components, JSX files, hooks, or React-specific code"
-  stack_category: frontend
-  progressive_disclosure: true
+  author: dsmj-ai-toolkit
+  version: "1.0"
+  category: stack
+  last_updated: 2026-01-17
 ---
 ```
 
@@ -169,14 +190,14 @@ metadata:
 ```yaml
 ---
 name: security
-version: 1.0.0
-description: OWASP Top 10 security best practices, auth patterns, and secure coding. Use when implementing authentication, handling user input, or dealing with sensitive data.
-tags: [security, owasp, authentication, authorization, validation]
-author: dsmj-ai-toolkit
+description: >
+  OWASP Top 10 security best practices and auth patterns.
+  Trigger: When implementing authentication or handling user input.
 metadata:
-  auto_invoke: "Implementing auth, handling user input, or working with sensitive data"
+  author: dsmj-ai-toolkit
+  version: "1.0"
   category: domain
-  progressive_disclosure: true
+  last_updated: 2026-01-17
 ---
 ```
 
@@ -184,64 +205,150 @@ metadata:
 ```yaml
 ---
 name: context-monitor
-description: Detects conversation drift and suggests refocusing. Use when conversation exceeds 50 messages or multiple topics are mixed.
-tags: [meta, monitoring, workflow]
-author: dsmj-ai-toolkit
+description: >
+  Detects conversation drift and suggests refocusing.
+  Trigger: When conversation exceeds 50 messages or topics are mixed.
 metadata:
+  author: dsmj-ai-toolkit
+  version: "1.0"
   category: meta
-  progressive_disclosure: false
+  last_updated: 2026-01-17
 ---
 ```
+
+**Note**: All examples now follow the simplified format with explicit "Trigger:" clause.
 
 ---
 
 ## Skill Structure
 
-### Core Sections (Required)
+### Required Sections (v1.1.0+)
 
-Every skill must have:
+Based on [Gentleman-Skills](https://github.com/Gentleman-Programming/Gentleman-Skills) best practices, every skill MUST have:
 
-#### 1. Title & Tagline
+#### 1. When to Use (REQUIRED)
 ```markdown
-# Skill Name - One-Line Purpose
+## When to Use
 
-**Brief tagline describing domain knowledge**
+Load this skill when:
+- [Condition 1, e.g., "Working with React Server Components"]
+- [Condition 2, e.g., "Building Next.js 15 applications"]
+- [Condition 3, e.g., "Using App Router patterns"]
 ```
 
-#### 2. Overview
-```markdown
-## Overview
+**Minimum**: 3 clear conditions when the skill should be loaded.
 
-**What this skill provides**: [Brief description]
-**When to use**: [Specific scenarios]
-**Key concepts**: [Core knowledge areas]
+#### 2. Critical Patterns (REQUIRED)
+```markdown
+## Critical Patterns
+
+### Pattern 1: [Name]
+
+[Brief explanation]
+
+\`\`\`typescript
+// ✅ GOOD: Correct implementation
+const example = () => {
+  // Best practice code
+};
+
+// ❌ BAD: Common mistake
+const badExample = () => {
+  // What NOT to do
+};
+\`\`\`
+
+**When to use**: [Specific scenario]
 ```
 
-#### 3. Core Concepts
-```markdown
-## Core Concepts
+**Minimum**: 3 patterns, each showing BOTH good (✅) and bad (❌) examples side-by-side.
 
-### Concept 1: [Name]
-**What it is**: Explanation
-**Best practices**: Do's and don'ts
-**Example**: Code demonstrating concept
+#### 3. Code Examples (REQUIRED)
+```markdown
+## Code Examples
+
+### Example 1: [Common Use Case]
+
+**Scenario**: [What user is trying to accomplish]
+
+\`\`\`typescript
+// Complete working example
+import { something } from 'library';
+
+function Example() {
+  // Full implementation
+  return result;
+}
+\`\`\`
+
+**Key points**:
+- Point 1 explaining the code
+- Point 2 highlighting best practice
 ```
 
-Typically 3-5 core concepts.
+**Minimum**: 3 complete, runnable examples solving real-world problems.
 
-#### 4. Patterns & Best Practices
+#### 4. Anti-Patterns (REQUIRED)
 ```markdown
-## Patterns & Best Practices
+## Anti-Patterns
 
-### Pattern 1: [Pattern Name]
-**Use when**: Scenario
-**Implementation**: Working code example
-**Why this works**: Explanation
+### Don't: [Anti-pattern Name]
+
+**Why this is bad**:
+- Reason 1
+- Reason 2
+
+\`\`\`typescript
+// ❌ BAD
+const badPattern = () => {
+  // What NOT to do
+};
+\`\`\`
+
+**Instead, do this**:
+\`\`\`typescript
+// ✅ GOOD
+const goodPattern = () => {
+  // Correct approach
+};
+\`\`\`
 ```
 
-Actionable patterns with code examples.
+**Minimum**: 2 anti-patterns with explanations.
 
-#### 5. Common Scenarios
+#### 5. Keywords (REQUIRED)
+```markdown
+## Keywords
+
+[technology-name], [framework], [pattern-1], [pattern-2], [use-case]
+```
+
+For searchability and skill discovery.
+
+### Recommended Sections
+
+These sections are highly recommended but not required:
+
+#### 6. Quick Reference (Recommended)
+```markdown
+## Quick Reference
+
+| Task | Pattern | Notes |
+|------|---------|-------|
+| [Common task] | `code snippet` | When to use |
+```
+
+#### 7. Edge Cases & Gotchas (Recommended)
+```markdown
+## Edge Cases & Gotchas
+
+### Edge Case 1: [Name]
+**When this happens**: [Scenario]
+**Solution**: [Code]
+```
+
+#### 8. Progressive Disclosure (Optional)
+For skills > 500 lines, use `references/` folder for detailed content.
 ```markdown
 ## Common Scenarios
 

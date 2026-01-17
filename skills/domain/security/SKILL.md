@@ -1,13 +1,18 @@
 ---
 name: security
 version: 1.0.0
-description: Security best practices covering OWASP Top 10, authentication, authorization, and common vulnerabilities. Use when implementing auth, handling user input, or dealing with sensitive data.
+description: >
+  Security best practices covering OWASP Top 10, authentication, authorization, and common vulnerabilities.
+  Trigger: When implementing authentication, when handling user input, when storing sensitive data, when building APIs, when conducting security reviews, when implementing authorization.
 tags: [security, owasp, authentication, authorization, encryption, vulnerabilities]
 author: dsmj-ai-toolkit
 metadata:
   auto_invoke: "Implementing authentication, handling user input, storing sensitive data, API security, or security reviews"
   domain_category: security
   progressive_disclosure: true
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 ---
 
 # Security Skill

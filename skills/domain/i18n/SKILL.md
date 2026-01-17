@@ -1,9 +1,15 @@
 ---
 name: i18n
 domain: frontend
-description: Internationalization (i18n) patterns for multi-language applications. Covers next-intl, ICU message syntax, pluralization, date/number formatting, RTL support, and locale management.
+description: >
+  Internationalization (i18n) patterns for multi-language applications. Covers next-intl, ICU message syntax, pluralization, date/number formatting, RTL support, and locale management.
+  Trigger: When implementing translations, when supporting multiple languages, when formatting dates or numbers for different locales, when handling RTL languages, when managing translation files.
 version: 1.0.0
 tags: [i18n, internationalization, localization, next-intl, translations, rtl]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: domain
 references:
   - name: next-intl Documentation
     url: https://next-intl-docs.vercel.app/

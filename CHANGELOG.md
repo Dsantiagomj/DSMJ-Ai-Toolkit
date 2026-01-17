@@ -73,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Features
 - CLAUDE.md template with Prompt DNA system
-- Maestro Mode for casual communication style
+- Customizable communication styles
 - Quality gates workflow (Frame → Scope → Generate → Review → Verify)
 - Skills catalog with community and official skills
 - Progressive disclosure for efficient context usage

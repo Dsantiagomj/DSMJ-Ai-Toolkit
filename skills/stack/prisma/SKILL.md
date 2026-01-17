@@ -1,9 +1,15 @@
 ---
 name: prisma
 domain: backend
-description: Prisma ORM for TypeScript - Next-generation ORM with type-safe queries, migrations, and database management. Use for database operations, schema design, and data access patterns.
+description: >
+  Prisma ORM for TypeScript - Next-generation ORM with type-safe queries, migrations, and database management.
+  Trigger: When defining Prisma schema, when writing database queries, when creating migrations, when setting up database models.
 version: 1.0.0
 tags: [prisma, orm, database, typescript, postgresql, mysql, sqlite, migrations]
+metadata:
+  version: "1.0"
+  last_updated: "2026-01-17"
+  category: stack
 references:
   - name: Prisma Documentation
     url: https://www.prisma.io/docs
