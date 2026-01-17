@@ -5,7 +5,8 @@ A production-quality AI toolkit for Claude Code with specialized agents, modular
 ## Features
 
 - **🎯 Specialist Agents**: 6 focused agents (code-writer, code-reviewer, planner, qa, git-docs, devops)
-- **🧩 18 Modular Skills**: Stack-specific knowledge (React, TypeScript, Docker, Prisma, etc.) + domain expertise (security, accessibility, performance)
+- **🧩 19 Modular Skills**: Stack-specific knowledge (React, TypeScript, Docker, Prisma, etc.) + domain expertise (security, accessibility, performance, UI/UX)
+- **📚 Progressive Disclosure**: Main files 300-700 lines, detailed content in references/ folders
 - **🔄 Auto-Stack Detection**: Automatically configures skills based on your project
 - **🔗 Symlink Architecture**: Global installation, per-project configuration
 - **🛡️ Security First**: OWASP patterns and quality gates built-in
@@ -59,13 +60,13 @@ curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/un
 | **git-docs** | Git + Docs | Commits, PRs, documentation |
 | **devops** | Operations | CI/CD, deployment, monitoring |
 
-### 18 Skills
+### 19 Skills
 
 **Stack** (9): React, TypeScript, Docker, Prisma, tRPC, Radix UI, React Hook Form, Zustand, Vercel AI SDK
 
-**Domain** (8): Security, Accessibility, API Design, Database Migrations, i18n, Design Patterns, Performance, Testing Frameworks
+**Domain** (9): Security, Accessibility, API Design, Database Migrations, i18n, Design Patterns, Performance, Testing Frameworks, UI/UX
 
-**Meta** (1): Context Monitor
+**Meta** (1): Skill Creator
 
 [See full skills list →](skills/CATALOG.md)
 
@@ -85,7 +86,7 @@ curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/un
 │  Global: ~/.dsmj-ai-toolkit/                        │
 ├─────────────────────────────────────────────────────┤
 │  ├── agents/            ← 6 specialist agents      │
-│  ├── skills/            ← 18 knowledge modules     │
+│  ├── skills/            ← 19 knowledge modules     │
 │  ├── templates/         ← CLAUDE.md template       │
 │  └── bin/dsmj-ai        ← CLI tool                 │
 └─────────────────────────────────────────────────────┘
