@@ -165,31 +165,6 @@ Result: Complete, tested, secure feature ready to ship
 - **Security by Default**: Auth, validation, error handling built-in
 - **Progressive Disclosure**: Load knowledge only when needed
 
-## Roadmap
-
-### ✅ Phase 1: Core Architecture (Complete)
-- 6 specialized agents
-- 18 skills with progressive disclosure
-- CLI tool with auto-stack detection
-- MCP-safe installation
-
-### ✅ Phase 2: Skills & Polish (Complete)
-- Stack skills (React, TypeScript, Docker, etc.)
-- Domain skills (security, accessibility, performance)
-- Comprehensive guides and templates
-
-### ✅ Phase 3: Distribution (Complete)
-- curl installation script
-- Homebrew formula
-- GitHub Actions releases
-- Uninstall script
-
-### 🔲 Phase 4: Community & Ecosystem
-- Community skill marketplace
-- VS Code extension
-- Skill recommendations based on codebase
-- Team conventions sync
-
 ## Contributing
 
 Contributions welcome! Please:
@@ -212,12 +187,14 @@ MIT License - see [LICENSE](LICENSE) file
 
 ## Credits
 
-Built by [David Santiago M.](https://github.com/dsantiagomj)
+Built by [Daniel Santiago M.](https://github.com/dsantiagomj)
 
 Inspired by:
 - [Agent Skills](https://agentskills.io) open standard
 - [Prowler](https://github.com/prowler-cloud/prowler) skills-based architecture
 - Vibe Coding principles for AI-directed development
+- [Awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents)
+- [Awesome-claude-code-skills](https://github.com/VoltAgent/awesome-claude-skills)
 
 ---
 
