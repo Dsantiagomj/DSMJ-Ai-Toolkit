@@ -244,67 +244,7 @@ export const updatePost = publicProcedure
 
 ### Pattern 5: Client-Side Optimistic Updates
 
-```typescript
-// ✅ Good: Optimistic updates with rollback
-'use client';
-
-import { api } from '@/lib/api';
-
-export function PostList() {
-  const utils = api.useUtils();
-  
-  const { data: posts } = api.post.getAll.useQuery();
-  
-  const deletePost = api.post.delete.useMutation({
-    onMutate: async (deletedPost) => {
-      // Cancel outgoing refetches
-      await utils.post.getAll.cancel();
-      
-      // Snapshot previous value
-      const previousPosts = utils.post.getAll.getData();
-      
-      // Optimistically update
-      utils.post.getAll.setData(undefined, (old) =>
-        old?.filter((p) => p.id !== deletedPost.id)
-      );
-      
-      return { previousPosts };
-    },
-    
-    onError: (err, deletedPost, context) => {
-      // Rollback on error
-      utils.post.getAll.setData(undefined, context?.previousPosts);
-    },
-    
-    onSettled: () => {
-      // Refetch after error or success
-      utils.post.getAll.invalidate();
-    },
-  });
-
-  return (
-    <div>
-      {posts?.map(post => (
-        <div key={post.id}>
-          {post.title}
-          <button onClick={() => deletePost.mutate({ id: post.id })}>
-            Delete
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ❌ Bad: No optimistic updates, slow UX
-const deletePost = api.post.delete.useMutation({
-  onSuccess: () => {
-    utils.post.getAll.invalidate(); // Wait for server response
-  },
-});
-```
-
-**Why**: Optimistic updates provide instant feedback; rollback on error maintains data consistency.
+For optimistic updates with rollback, see [references/client.md](./references/client.md).
 
 ---
 
@@ -374,51 +314,27 @@ export const createPost = protectedProcedure.mutation(/* ... */);
 ### Anti-Pattern 3: Over-fetching with getAll
 
 ```typescript
-// ❌ Problem: Fetching all data when you need filtered/paginated results
+// ❌ Problem: Fetching all data without pagination
 export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.post.findMany(); // Could be thousands of posts
+    return ctx.db.post.findMany(); // Could be thousands!
   }),
 });
 
-// Client filters in memory
-const { data: posts } = api.post.getAll.useQuery();
-const publishedPosts = posts?.filter(p => p.published);
-```
-
-**Why it's wrong**: Wastes bandwidth, slow client-side filtering, poor performance.
-
-**Solution**:
-```typescript
-// ✅ Server-side filtering and pagination
+// ✅ Solution: Server-side filtering and pagination
 export const postRouter = createTRPCRouter({
   getAll: publicProcedure
-    .input(
-      z.object({
-        limit: z.number().min(1).max(100).default(10),
-        cursor: z.string().optional(),
-        published: z.boolean().optional(),
-      })
-    )
+    .input(z.object({
+      limit: z.number().min(1).max(100).default(10),
+      published: z.boolean().optional(),
+    }))
     .query(async ({ ctx, input }) => {
-      const posts = await ctx.db.post.findMany({
-        take: input.limit + 1,
-        cursor: input.cursor ? { id: input.cursor } : undefined,
+      return ctx.db.post.findMany({
+        take: input.limit,
         where: { published: input.published },
       });
-      
-      let nextCursor: string | undefined = undefined;
-      if (posts.length > input.limit) {
-        const nextItem = posts.pop();
-        nextCursor = nextItem!.id;
-      }
-      
-      return { posts, nextCursor };
     }),
 });
-
-// Client uses pagination
-const { data } = api.post.getAll.useQuery({ limit: 20, published: true });
 ```
 
 ---
@@ -426,170 +342,22 @@ const { data } = api.post.getAll.useQuery({ limit: 20, published: true });
 ### Anti-Pattern 4: Not Handling Errors Properly
 
 ```typescript
-// ❌ Problem: Generic errors without context
-export const createPost = protectedProcedure
-  .input(z.object({ title: z.string() }))
-  .mutation(async ({ ctx, input }) => {
-    const post = await ctx.db.post.create({ data: input });
-    if (!post) {
-      throw new Error('Failed'); // Generic error
-    }
-    return post;
-  });
-```
+// ❌ Generic errors
+throw new Error('Failed');
 
-**Why it's wrong**: Poor error messages; client can't distinguish error types; no proper HTTP status codes.
-
-**Solution**:
-```typescript
 // ✅ Use TRPCError with specific codes
 import { TRPCError } from '@trpc/server';
-
-export const createPost = protectedProcedure
-  .input(z.object({ title: z.string() }))
-  .mutation(async ({ ctx, input }) => {
-    // Check permissions
-    if (!ctx.session.user.canCreatePosts) {
-      throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You do not have permission to create posts',
-      });
-    }
-
-    try {
-      return await ctx.db.post.create({
-        data: {
-          ...input,
-          authorId: ctx.session.user.id,
-        },
-      });
-    } catch (error) {
-      if (error.code === 'P2002') {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'A post with this title already exists',
-        });
-      }
-      
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to create post',
-        cause: error,
-      });
-    }
-  });
-
-// Client can handle specific errors
-const createPost = api.post.create.useMutation({
-  onError: (error) => {
-    if (error.data?.code === 'FORBIDDEN') {
-      toast.error('Permission denied');
-    } else if (error.data?.code === 'CONFLICT') {
-      toast.error('Post already exists');
-    } else {
-      toast.error('Something went wrong');
-    }
-  },
+throw new TRPCError({
+  code: 'FORBIDDEN',
+  message: 'You do not have permission',
 });
 ```
+
+For detailed error handling patterns, see [references/routers.md](./references/routers.md).
 
 ---
 
-### Anti-Pattern 5: Calling Procedures from Other Procedures
-
-```typescript
-// ❌ Problem: Calling tRPC procedures from within procedures
-export const postRouter = createTRPCRouter({
-  getById: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.post.findUnique({ where: { id: input.id } });
-    }),
-
-  getWithAuthor: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input, caller }) => {
-      // Don't do this!
-      const post = await caller.post.getById({ id: input.id });
-      const author = await ctx.db.user.findUnique({ where: { id: post.authorId } });
-      return { post, author };
-    }),
-});
-```
-
-**Why it's wrong**: Unnecessary overhead; bypasses middleware; confusing data flow; hard to test.
-
-**Solution**:
-```typescript
-// ✅ Extract shared logic into separate functions
-async function getPostById(ctx: Context, id: string) {
-  return ctx.db.post.findUnique({ where: { id } });
-}
-
-export const postRouter = createTRPCRouter({
-  getById: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return getPostById(ctx, input.id);
-    }),
-
-  getWithAuthor: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const post = await getPostById(ctx, input.id);
-      const author = await ctx.db.user.findUnique({ 
-        where: { id: post.authorId } 
-      });
-      return { post, author };
-    }),
-});
-
-// ✅ Or use database relations
-export const getWithAuthor = publicProcedure
-  .input(z.object({ id: z.string() }))
-  .query(async ({ ctx, input }) => {
-    return ctx.db.post.findUnique({
-      where: { id: input.id },
-      include: { author: true },
-    });
-  });
-```
-
----
-
-### Anti-Pattern 6: Not Using Query Invalidation
-
-```typescript
-// ❌ Problem: Stale data after mutations
-const createPost = api.post.create.useMutation();
-
-// After creating, list still shows old data
-```
-
-**Why it's wrong**: UI shows stale data; users don't see their changes; confusing UX.
-
-**Solution**:
-```typescript
-// ✅ Invalidate queries after mutations
-const utils = api.useUtils();
-
-const createPost = api.post.create.useMutation({
-  onSuccess: () => {
-    utils.post.getAll.invalidate(); // Refetch all posts
-  },
-});
-
-// ✅ Or invalidate multiple related queries
-const deletePost = api.post.delete.useMutation({
-  onSuccess: (_, variables) => {
-    utils.post.getAll.invalidate();
-    utils.post.getById.invalidate({ id: variables.id });
-    utils.user.getPostCount.invalidate();
-  },
-});
-
-// ✅ Or use optimistic updates (see Pattern 5)
-```
+For more anti-patterns (calling procedures from procedures, query invalidation, error handling), see [references/client.md](./references/client.md).
 
 ---
 

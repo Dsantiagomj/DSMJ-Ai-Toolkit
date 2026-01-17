@@ -305,149 +305,42 @@ function UserMenu() {
 
 ### ❌ Anti-Pattern 2: Large useEffect with Multiple Responsibilities
 
-**Don't do this**:
 ```tsx
 // ❌ One effect doing too many things
 useEffect(() => {
-  // Fetching data
   fetch('/api/user').then(setUser)
-
-  // Setting up WebSocket
   const socket = new WebSocket('ws://...')
-  socket.onmessage = handleMessage
-
-  // Starting timer
   const timer = setInterval(() => refreshData(), 5000)
-
-  // Analytics
   analytics.track('page_view')
-
-  return () => {
-    socket.close()
-    clearInterval(timer)
-  }
+  return () => { socket.close(); clearInterval(timer); }
 }, []) // What dependencies are needed? Unclear!
-```
 
-**Why it's bad**: Hard to understand, difficult to track dependencies, cleanup is complex, harder to test.
-
-**Do this instead**:
-```tsx
 // ✅ Separate effects for separate concerns
-useEffect(() => {
-  fetch('/api/user').then(setUser)
-}, []) // Clear: runs once on mount
-
+useEffect(() => fetch('/api/user').then(setUser), [])
 useEffect(() => {
   const socket = new WebSocket('ws://...')
-  socket.onmessage = handleMessage
   return () => socket.close()
-}, [handleMessage]) // Clear: depends on handleMessage
-
-useEffect(() => {
-  const timer = setInterval(() => refreshData(), 5000)
-  return () => clearInterval(timer)
-}, [refreshData]) // Clear: depends on refreshData
-
-useEffect(() => {
-  analytics.track('page_view')
-}, []) // Clear: analytics on mount
+}, [handleMessage])
 ```
 
 ---
 
 ### ❌ Anti-Pattern 3: Mutating State Directly
 
-**Don't do this**:
 ```tsx
 // ❌ Mutating state directly
-function TodoList() {
-  const [todos, setTodos] = useState([])
-
-  const addTodo = (text) => {
-    todos.push({ id: Date.now(), text }) // ❌ Direct mutation
-    setTodos(todos) // ❌ React won't detect the change
-  }
-
-  const toggleTodo = (id) => {
-    const todo = todos.find(t => t.id === id)
-    todo.completed = !todo.completed // ❌ Direct mutation
-    setTodos(todos) // ❌ Same reference, no re-render
-  }
-
-  return <div>{/* ... */}</div>
+const addTodo = (text) => {
+  todos.push({ id: Date.now(), text }) // ❌ Direct mutation
+  setTodos(todos) // ❌ React won't detect the change
 }
-```
 
-**Why it's bad**: React compares state by reference. Mutating state directly means React won't detect changes, leading to bugs and missing re-renders.
-
-**Do this instead**:
-```tsx
 // ✅ Create new state objects
-function TodoList() {
-  const [todos, setTodos] = useState([])
-
-  const addTodo = (text) => {
-    setTodos([...todos, { id: Date.now(), text }]) // ✅ New array
-  }
-
-  const toggleTodo = (id) => {
-    setTodos(todos.map(todo => // ✅ New array with new objects
-      todo.id === id
-        ? { ...todo, completed: !todo.completed } // ✅ New object
-        : todo
-    ))
-  }
-
-  return <div>{/* ... */}</div>
+const addTodo = (text) => {
+  setTodos([...todos, { id: Date.now(), text }]) // ✅ New array
 }
 ```
 
----
-
-### ❌ Anti-Pattern 4: Overusing useEffect for Derived State
-
-**Don't do this**:
-```tsx
-// ❌ Using effect to sync derived state
-function ProductList({ products, searchQuery }) {
-  const [filteredProducts, setFilteredProducts] = useState([])
-
-  // ❌ Unnecessary effect for derived data
-  useEffect(() => {
-    setFilteredProducts(
-      products.filter(p => p.name.includes(searchQuery))
-    )
-  }, [products, searchQuery])
-
-  return <div>{filteredProducts.map(...)}</div>
-}
-```
-
-**Why it's bad**: Extra render cycle, more complex code, can cause infinite loops if not careful, unnecessary state.
-
-**Do this instead**:
-```tsx
-// ✅ Calculate during render
-function ProductList({ products, searchQuery }) {
-  // ✅ Derived data - no state needed
-  const filteredProducts = products.filter(p =>
-    p.name.includes(searchQuery)
-  )
-
-  return <div>{filteredProducts.map(...)}</div>
-}
-
-// ✅ Or memoize if expensive
-function ProductList({ products, searchQuery }) {
-  const filteredProducts = useMemo(() =>
-    products.filter(p => p.name.includes(searchQuery)),
-    [products, searchQuery]
-  )
-
-  return <div>{filteredProducts.map(...)}</div>
-}
-```
+For more anti-patterns and best practices, see [references/best-practices.md](./references/best-practices.md).
 
 ---
 
@@ -517,16 +410,13 @@ export default function Counter() {
 ```tsx
 // app/actions.ts
 'use server'
-
 export async function createUser(formData: FormData) {
-  const name = formData.get('name')
-  await db.users.create({ name })
+  await db.users.create({ name: formData.get('name') })
   revalidatePath('/users')
 }
 
 // app/users/page.tsx
 import { createUser } from './actions'
-
 export default function UsersPage() {
   return (
     <form action={createUser}>
@@ -537,11 +427,7 @@ export default function UsersPage() {
 }
 ```
 
-**Benefits**:
-- No API routes needed
-- Type-safe with TypeScript
-- Progressive enhancement
-- Automatic revalidation
+For advanced Server Actions patterns, see [references/server-components.md](./references/server-components.md).
 
 ---
 
@@ -590,130 +476,15 @@ export function Timer() {
 }
 ```
 
-### useOptimistic (React 19)
-
-```tsx
-'use client'
-import { useOptimistic } from 'react'
-import { sendMessage } from './actions'
-
-export function Messages({ messages }: { messages: Message[] }) {
-  const [optimisticMessages, addOptimistic] = useOptimistic(
-    messages,
-    (state, newMessage: string) => [
-      ...state,
-      { text: newMessage, sending: true }
-    ]
-  )
-
-  async function formAction(formData: FormData) {
-    const message = formData.get('message') as string
-    addOptimistic(message)
-    await sendMessage(message)
-  }
-
-  return (
-    <form action={formAction}>
-      {optimisticMessages.map((msg, i) => (
-        <div key={i} className={msg.sending ? 'opacity-50' : ''}>
-          {msg.text}
-        </div>
-      ))}
-      <input name="message" />
-    </form>
-  )
-}
-```
+For advanced hooks (useOptimistic, useTransition, custom hooks), see [references/hooks.md](./references/hooks.md).
 
 ---
 
-## Component Patterns
+## Component Patterns & Performance
 
-### Composition
-
-```tsx
-// ✅ Good: Composition over configuration
-<Modal onClose={handleClose}>
-  <Modal.Header>
-    <Modal.Title>Settings</Modal.Title>
-  </Modal.Header>
-  <Modal.Content>{/* ... */}</Modal.Content>
-</Modal>
-
-// ❌ Bad: Too many props
-<Modal
-  showCloseButton={true}
-  closeButtonPosition="top-right"
-  closeButtonColor="red"
-  onClose={handleClose}
-/>
-```
-
-### TypeScript Props
-
-```tsx
-// Simple inline props
-export default function Button({ label, onClick }: {
-  label: string
-  onClick: () => void
-}) {
-  return <button onClick={onClick}>{label}</button>
-}
-
-// Complex props with interface
-interface UserCardProps {
-  user: {
-    name: string
-    email: string
-    avatar?: string
-  }
-  showEmail?: boolean
-  onEdit?: (id: string) => void
-}
-
-export default function UserCard({ user, showEmail = true }: UserCardProps) {
-  return <div>{user.name}</div>
-}
-```
-
----
-
-## Performance Basics
-
-### React.memo
-
-```tsx
-import { memo } from 'react'
-
-// ✅ Memo for expensive components
-export default memo(function ExpensiveChart({ data }: { data: number[] }) {
-  const processed = expensiveCalculation(data)
-  return <Chart data={processed} />
-})
-```
-
-### useMemo / useCallback
-
-```tsx
-'use client'
-import { useMemo, useCallback } from 'react'
-
-export function DataTable({ data }: { data: Item[] }) {
-  const [filter, setFilter] = useState('')
-
-  // Memoize expensive calculations
-  const filtered = useMemo(() => {
-    return data.filter(item => item.name.includes(filter))
-  }, [data, filter])
-
-  // Memoize callbacks
-  const handleDelete = useCallback((id: string) => {
-    deleteItem(id)
-  }, [])
-
-  return <div>{/* ... */}</div>
-}
-```
+For composition patterns, TypeScript props, React.memo, and performance optimization, see:
+- [references/typescript.md](./references/typescript.md) - TypeScript patterns and props
+- [references/performance.md](./references/performance.md) - Optimization techniques
 
 ---
 

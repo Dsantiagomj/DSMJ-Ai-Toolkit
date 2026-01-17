@@ -216,73 +216,15 @@ RUN npm ci
 
 ### Pattern 4: Health Checks for Container Monitoring
 
-**When**: Production containers
-
-**Good**:
 ```dockerfile
-# ✅ Health check built into image
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
-
-# Add health check
+# ✅ Good: Health check built into image
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD node healthcheck.js
 
-EXPOSE 3000
-
-CMD ["node", "index.js"]
+# ❌ Bad: No health check
 ```
 
-```javascript
-// healthcheck.js
-const http = require('http');
-
-const options = {
-  hostname: 'localhost',
-  port: 3000,
-  path: '/health',
-  method: 'GET',
-  timeout: 2000
-};
-
-const req = http.request(options, (res) => {
-  process.exit(res.statusCode === 200 ? 0 : 1);
-});
-
-req.on('error', () => process.exit(1));
-req.on('timeout', () => {
-  req.destroy();
-  process.exit(1);
-});
-
-req.end();
-```
-
-**Bad**:
-```dockerfile
-# ❌ No health check
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
-
-EXPOSE 3000
-
-CMD ["node", "index.js"]
-# Container appears running even if app crashed
-```
-
-**Why**: Health checks enable container orchestrators to detect failures, automatically restart unhealthy containers, prevent routing traffic to failing instances, and provide visibility into application health.
+**Why**: Health checks enable automatic restart and prevent routing traffic to failing instances. For complete health check patterns, see [references/production.md](./references/production.md).
 
 ---
 
@@ -439,121 +381,7 @@ services:
 
 ---
 
-### ❌ Anti-Pattern 4: Bloated Images with Unnecessary Packages
-
-**Don't do this**:
-```dockerfile
-# ❌ Using full OS image
-FROM ubuntu:22.04
-
-# ❌ Installing everything including kitchen sink
-RUN apt-get update && apt-get install -y \
-    curl \
-    wget \
-    vim \
-    git \
-    build-essential \
-    python3 \
-    python3-pip \
-    nodejs \
-    npm
-
-WORKDIR /app
-
-COPY . .
-
-RUN npm install
-
-CMD ["node", "index.js"]
-
-# Final image: 800MB+
-```
-
-**Why it's bad**: Larger attack surface, slower builds and deployments, wasted disk space and bandwidth, more vulnerabilities to patch, higher hosting costs.
-
-**Do this instead**:
-```dockerfile
-# ✅ Use Alpine-based minimal images
-FROM node:20-alpine
-
-# ✅ Only install what's needed
-RUN apk add --no-cache \
-    dumb-init
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
-
-# ✅ Use dumb-init for proper signal handling
-ENTRYPOINT ["dumb-init", "--"]
-
-CMD ["node", "index.js"]
-
-# Final image: 150MB
-```
-
----
-
-### ❌ Anti-Pattern 5: Not Using .dockerignore
-
-**Don't do this**:
-```dockerfile
-# ❌ No .dockerignore file exists
-
-FROM node:20-alpine
-
-WORKDIR /app
-
-# ❌ Copies everything, including:
-# - node_modules (800MB)
-# - .git directory (100MB)
-# - IDE config files
-# - Build artifacts
-# - Sensitive files
-COPY . .
-
-RUN npm ci
-
-CMD ["node", "index.js"]
-```
-
-**Why it's bad**: Bloated build context (slow builds), accidentally includes secrets, includes unnecessary files in final image, wastes network bandwidth, longer CI/CD times.
-
-**Do this instead**:
-```
-# ✅ .dockerignore
-node_modules
-.git
-.env
-.env.local
-dist
-build
-coverage
-.DS_Store
-.idea
-.vscode
-*.log
-README.md
-docker-compose*.yml
-Dockerfile*
-```
-
-```dockerfile
-# ✅ Now COPY . . is lean
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
-
-CMD ["node", "index.js"]
-```
+For more anti-patterns (bloated images, .dockerignore, security best practices), see [references/best-practices.md](./references/best-practices.md).
 
 ---
 
@@ -600,41 +428,7 @@ CMD ["node", "dist/index.js"]
 
 ## Docker Compose
 
-### Next.js + PostgreSQL
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - '3000:3000'
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/myapp
-      - NODE_ENV=production
-    depends_on:
-      - db
-    restart: unless-stopped
-
-  db:
-    image: postgres:16-alpine
-    ports:
-      - '5432:5432'
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=myapp
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-volumes:
-  postgres_data:
-```
+For full docker-compose examples with multiple services, see [references/advanced.md](./references/advanced.md).
 
 ---
 
