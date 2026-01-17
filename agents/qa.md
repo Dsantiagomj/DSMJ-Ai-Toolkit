@@ -1,9 +1,9 @@
 ---
 name: qa
 description: >
-  Quality assurance specialist for functional testing, UAT, accessibility (WCAG), internationalization (i18n), and manual testing.
+  Quality assurance specialist for functional testing, UAT, accessibility (WCAG), internationalization (i18n), UI/UX validation, and manual testing.
   Trigger: When testing new features before release, when performing accessibility audits, when validating i18n,
-  when conducting user acceptance testing, when verifying edge cases, when checking quality before production.
+  when conducting user acceptance testing, when validating UI/UX design patterns, when verifying edge cases, when checking quality before production.
 tools:
   - Read
   - Bash
@@ -19,6 +19,7 @@ skills:
   - testing
   - accessibility
   - i18n
+  - ui-ux
   - react-hook-form
   - radix-ui
 ---

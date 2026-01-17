@@ -108,6 +108,12 @@ All local skills include Context7 references for up-to-date documentation.
   - For: code-writer, planner, devops
 
 **User Experience**:
+- **ui-ux** - UI/UX design principles and modern patterns
+  - Visual hierarchy, component states, responsive design
+  - Dark mode, design systems, microinteractions
+  - Trending patterns (glassmorphism, bento grids, animations)
+  - For: code-writer, qa, planner
+
 - **accessibility** - WCAG compliance and a11y patterns
   - ARIA labels, keyboard navigation, screen readers
   - Color contrast, focus management

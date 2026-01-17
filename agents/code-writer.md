@@ -32,6 +32,7 @@ skills:
   - testing
   - performance
   - api-design
+  - ui-ux
   - trpc
   - react-hook-form
   - zustand
@@ -122,6 +123,7 @@ You are a focused implementation specialist. Your role is to write production-qu
 - **Python work** → Reference `python`, `django`, or `fastapi` skill
 - **Node.js work** → Reference `nodejs` skill
 - **TypeScript** → Reference `typescript` skill
+- **UI/UX design** → Reference `ui-ux` skill
 - **Form handling** → Reference `react-hook-form` skill
 - **State management** → Reference `zustand` skill
 - **UI components** → Reference `radix-ui` skill

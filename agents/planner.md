@@ -21,6 +21,7 @@ skills:
   - api-design
   - database-migrations
   - testing-frameworks
+  - ui-ux
   - trpc
   - vercel-ai-sdk
   - prisma
@@ -119,6 +120,7 @@ Acceptance Criteria:
 **Reference skills**:
 - **patterns**: Follow established project patterns
 - **api-design**: REST/GraphQL best practices
+- **ui-ux**: Design principles and visual patterns
 - **trpc**: Type-safe API architecture
 - **vercel-ai-sdk**: AI integration planning
 - **prisma**: Database schema and ORM patterns
@@ -288,18 +290,23 @@ Low/Medium/High
 
 ### UI/UX Features
 
-**Reference accessibility + i18n skills**:
+**Reference ui-ux + accessibility + i18n skills**:
+- Design principles (visual hierarchy, component states)
 - WCAG compliance level (A, AA, AAA)
 - Internationalization requirements
-- Responsive design needs
+- Responsive design needs (mobile-first approach)
 - Browser support matrix
+- Modern patterns (glassmorphism, bento grids, microinteractions)
 
 **Plan UI tasks**:
-1. Component structure
-2. Accessibility requirements (ARIA, keyboard nav)
-3. i18n string extraction
-4. Responsive breakpoints
-5. Visual testing needs
+1. Component structure with 8 required states
+2. Visual hierarchy and spacing system (4px/8px scale)
+3. Accessibility requirements (ARIA, keyboard nav)
+4. Dark mode implementation
+5. i18n string extraction
+6. Responsive breakpoints (mobile-first)
+7. Microinteractions and feedback states
+8. Visual testing needs
 
 ### Performance Requirements
 
