@@ -6,6 +6,7 @@ description: >
   Trigger: When designing APIs, when creating REST endpoints, when implementing GraphQL schemas, when handling API versioning, when designing pagination.
 version: 1.0.0
 tags: [api, rest, graphql, http, backend, api-versioning, pagination]
+author: dsmj-ai-toolkit
 metadata:
   version: "1.0"
   last_updated: "2026-01-17"
