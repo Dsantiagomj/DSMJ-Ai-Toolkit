@@ -5,7 +5,7 @@ A production-quality AI toolkit for Claude Code with specialized agents, modular
 ## Features
 
 - **🎯 Specialist Agents**: 6 focused agents (code-writer, code-reviewer, planner, qa, git-docs, devops)
-- **🧩 19 Modular Skills**: Stack-specific knowledge (React, TypeScript, Docker, Prisma, etc.) + domain expertise (security, accessibility, performance, UI/UX)
+- **🧩 27 Modular Skills**: Stack-specific knowledge (React, Next.js, Express, TypeScript, Tailwind, etc.) + domain expertise (security, authentication, caching, observability, CI/CD, etc.)
 - **📚 Progressive Disclosure**: Main files 300-700 lines, detailed content in references/ folders
 - **🔄 Auto-Stack Detection**: Automatically configures skills based on your project
 - **🔗 Symlink Architecture**: Global installation, per-project configuration
@@ -53,18 +53,18 @@ curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/un
 
 | Agent | Purpose | Use When |
 |-------|---------|----------|
-| **code-writer** | Implementation | Writing features, fixing bugs |
-| **code-reviewer** | Quality + Security | Reviewing code, running tests |
+| **code-writer** | Implementation | Writing features, fixing bugs, database operations |
+| **code-reviewer** | Quality + Security | Code review, security auditing, OWASP compliance |
 | **planner** | Architecture | Planning features, gathering requirements |
-| **qa** | Testing | UAT, accessibility, functional testing |
+| **qa** | Testing | UAT, accessibility, performance, functional testing |
 | **git-docs** | Git + Docs | Commits, PRs, documentation |
-| **devops** | Operations | CI/CD, deployment, monitoring |
+| **devops** | Operations | CI/CD, IaC, deployment, monitoring |
 
-### 19 Skills
+### 27 Skills
 
-**Stack** (9): React, TypeScript, Docker, Prisma, tRPC, Radix UI, React Hook Form, Zustand, Vercel AI SDK
+**Stack** (12): React, Next.js, Express, TypeScript, Tailwind, Docker, Prisma, tRPC, Radix UI, React Hook Form, Zustand, Vercel AI SDK
 
-**Domain** (9): Security, Accessibility, API Design, Database Migrations, i18n, Design Patterns, Performance, Testing Frameworks, UI/UX
+**Domain** (14): Security, Authentication, Caching, Error Handling, Observability, CI/CD, Accessibility, API Design, Database Migrations, i18n, Design Patterns, Performance, Testing Frameworks, UI/UX
 
 **Meta** (1): Skill Creator
 
@@ -86,7 +86,7 @@ curl -fsSL https://raw.githubusercontent.com/dsantiagomj/dsmj-ai-toolkit/main/un
 │  Global: ~/.dsmj-ai-toolkit/                        │
 ├─────────────────────────────────────────────────────┤
 │  ├── agents/            ← 6 specialist agents      │
-│  ├── skills/            ← 19 knowledge modules     │
+│  ├── skills/            ← 27 knowledge modules     │
 │  ├── templates/         ← CLAUDE.md template       │
 │  └── bin/dsmj-ai        ← CLI tool                 │
 └─────────────────────────────────────────────────────┘

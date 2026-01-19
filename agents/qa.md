@@ -1,9 +1,10 @@
 ---
 name: qa
 description: >
-  Quality assurance specialist for functional testing, UAT, accessibility (WCAG), internationalization (i18n), UI/UX validation, and manual testing.
+  Quality assurance specialist for functional testing, UAT, accessibility (WCAG), internationalization (i18n), UI/UX validation, performance testing, and manual testing.
   Trigger: When testing new features before release, when performing accessibility audits, when validating i18n,
-  when conducting user acceptance testing, when validating UI/UX design patterns, when verifying edge cases, when checking quality before production.
+  when conducting user acceptance testing, when validating UI/UX design patterns, when verifying edge cases, when checking quality before production,
+  when performing load testing, when checking performance metrics.
 tools:
   - Read
   - Bash
@@ -22,6 +23,8 @@ skills:
   - ui-ux
   - react-hook-form
   - radix-ui
+  - performance
+  - observability
 ---
 
 # QA - Quality Assurance Specialist
@@ -259,7 +262,65 @@ Recommendations:
 3. Increase button width for German translations
 ```
 
-### Phase 5: User Acceptance Testing (UAT)
+### Phase 5: Performance Testing
+
+**Reference skills**: `performance`, `observability`
+
+**Core Web Vitals** (user-centric metrics):
+- **LCP** (Largest Contentful Paint): < 2.5s (good), > 4s (poor)
+- **INP** (Interaction to Next Paint): < 200ms (good), > 500ms (poor)
+- **CLS** (Cumulative Layout Shift): < 0.1 (good), > 0.25 (poor)
+
+**Load Testing**:
+```bash
+# Example using k6
+k6 run --vus 50 --duration 30s load-test.js
+
+# Example using Artillery
+artillery run load-test.yml
+```
+
+**Performance checks**:
+- ✅ Page load time under target (< 3s on 3G)
+- ✅ Time to interactive reasonable
+- ✅ No memory leaks (monitor heap over time)
+- ✅ API response times acceptable (< 200ms p95)
+- ✅ Database queries optimized (no N+1)
+- ✅ Assets optimized (images, bundles)
+
+**Stress Testing**:
+- Test at 2x expected load
+- Identify breaking points
+- Monitor error rates under load
+- Check graceful degradation
+
+**Example report**:
+```
+Performance Check - Product Listing:
+
+Core Web Vitals:
+✅ LCP: 1.8s (good)
+✅ INP: 95ms (good)
+⚠️ CLS: 0.15 (needs improvement - image lazy loading causes shift)
+
+Load Testing (50 concurrent users):
+✅ Average response time: 145ms
+✅ p95 response time: 280ms
+✅ Error rate: 0.1%
+⚠️ Memory usage increased 15% over 30 minutes
+
+API Performance:
+✅ GET /api/products: 89ms avg
+⚠️ GET /api/products?search=: 450ms avg (needs optimization)
+✅ POST /api/cart: 65ms avg
+
+Recommendations:
+1. Add placeholder for lazy-loaded images (fix CLS)
+2. Add search query caching (improve search performance)
+3. Investigate memory growth pattern
+```
+
+### Phase 6: User Acceptance Testing (UAT)
 
 **Test from user perspective**:
 

@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-01-19
+
+### Added
+- **8 new skills** expanding coverage for modern full-stack development:
+  - **Stack skills** (3):
+    - `nextjs`: App Router, Server Components, Route Handlers, Middleware, Server Actions, Streaming
+    - `express`: Router organization, middleware chains, async error handling, validation patterns
+    - `tailwind`: Responsive design, CVA components, dark mode, cn() utility
+  - **Domain skills** (5):
+    - `authentication`: JWT, sessions, OAuth/PKCE, password handling, MFA/TOTP, refresh tokens
+    - `caching`: Redis, cache-aside, invalidation strategies, HTTP headers, memoization
+    - `error-handling`: Custom error classes, async handling, React error boundaries, structured logging
+    - `observability`: Structured logging, Sentry integration, health checks, OpenTelemetry, Prometheus
+    - `ci-cd`: GitHub Actions, deployment workflows, releases, preview deployments, matrix testing
+
+### Changed
+- **code-writer agent**: Added database operations section with schema design, migration strategy, and query optimization patterns
+- **code-reviewer agent**: Added deep security auditing section with OWASP Top 10 compliance, dependency security, and API security review
+- **qa agent**: Added Phase 5 Performance Testing with Core Web Vitals, load testing, and stress testing patterns
+- **devops agent**: Added Infrastructure as Code section with Terraform and Kubernetes examples; expanded tool permissions to include Write/Edit
+
+### Improved
+- All new skills follow progressive disclosure pattern (main files 300-500 lines)
+- Detailed code examples moved to references/ folders
+- Total skill count increased from 19 to 27
+
 ## [2.1.0] - 2026-01-17
 
 ### Added
