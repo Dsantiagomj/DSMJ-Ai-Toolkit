@@ -431,7 +431,7 @@ input CreateUserInput {
 }
 ```
 
-**Why**: Clear types, non-null fields (`!`), and input types make the API self-documenting and type-safe.
+**Why**: Clear types, non-null fields (the `!` suffix), and input types make the API self-documenting and type-safe.
 
 ---
 
